@@ -1,0 +1,88 @@
+export type Category = "tomate" | "creme" | "souffle" | "boisson";
+export type OrderStatus = "new" | "prep" | "ready" | "done";
+export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
+export type StaffRole = "admin" | "staff";
+
+export type Weekday =
+  | "monday"
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday"
+  | "saturday"
+  | "sunday";
+
+export interface TimeRange {
+  open: string; // "HH:MM"
+  close: string; // "HH:MM"
+}
+
+export type OpeningHours = Record<Weekday, TimeRange[]>;
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  category: Category;
+  price: number;
+  available: boolean;
+  sort_order: number;
+  tag: string | null;
+  to_confirm: boolean;
+}
+
+export interface Supplement {
+  id: string;
+  name: string;
+  price: number;
+  available: boolean;
+  applies_to: Category[];
+  sort_order: number;
+}
+
+export interface RestaurantSettings {
+  id: number;
+  restaurant_name: string;
+  address: string | null;
+  phone: string | null;
+  online_orders_open: boolean;
+  opening_hours: OpeningHours;
+  opening_hours_provisional: boolean;
+  min_prep_minutes: number;
+  slot_interval_minutes: number;
+}
+
+export interface OrderItem {
+  id: string;
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  supplement_name: string | null;
+  supplement_price: number | null;
+  meat: string | null;
+  line_total: number;
+  category: Category | null;
+}
+
+export interface Order {
+  id: string;
+  order_number: number;
+  customer_name: string;
+  customer_phone: string;
+  pickup_time: string; // ISO
+  note: string;
+  status: OrderStatus;
+  payment_status: PaymentStatus;
+  total: number;
+  created_at: string;
+  items: OrderItem[];
+}
+
+/** Ligne de panier telle que stockée dans le navigateur : aucun prix. */
+export interface CartLine {
+  productId: string;
+  quantity: number;
+  supplementId: string | null;
+  meat: string | null;
+}
