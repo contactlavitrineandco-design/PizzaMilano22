@@ -1,6 +1,6 @@
 import "server-only";
 import { createPublicClient } from "@/lib/supabase/public";
-import type { Product, RestaurantSettings, Supplement } from "@/lib/types";
+import type { GalleryPhoto, Product, RestaurantSettings, Supplement } from "@/lib/types";
 
 export function toProduct(r: Record<string, unknown>): Product {
   return {
@@ -13,6 +13,22 @@ export function toProduct(r: Record<string, unknown>): Product {
     sort_order: Number(r.sort_order ?? 0),
     tag: (r.tag as string | null) ?? null,
     to_confirm: Boolean(r.to_confirm),
+    image_path: (r.image_path as string | null) ?? null,
+    image_alt: (r.image_alt as string | null) ?? null,
+    image_source: (r.image_source as Product["image_source"]) ?? null,
+  };
+}
+
+export function toGalleryPhoto(r: Record<string, unknown>): GalleryPhoto {
+  return {
+    id: String(r.id),
+    section: r.section as GalleryPhoto["section"],
+    image_path: String(r.image_path),
+    alt: String(r.alt),
+    caption: String(r.caption ?? ""),
+    source: r.source as GalleryPhoto["source"],
+    published: Boolean(r.published),
+    sort_order: Number(r.sort_order ?? 0),
   };
 }
 
@@ -63,4 +79,21 @@ export async function getMenuData(): Promise<MenuData> {
     supplements: (supplements.data ?? []).map(toSupplement),
     settings: toSettings(settings.data),
   };
+}
+
+/** Photos publiées de la galerie « Découvrez notre pizzeria ». */
+export async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
+  const db = createPublicClient();
+  const { data, error } = await db
+    .from("gallery_photos")
+    .select("*")
+    .eq("published", true)
+    .order("sort_order")
+    .order("created_at");
+  if (error) {
+    // La galerie est secondaire : une erreur ne doit pas empêcher de commander.
+    console.error("[galerie] lecture impossible", error.message);
+    return [];
+  }
+  return (data ?? []).map(toGalleryPhoto);
 }

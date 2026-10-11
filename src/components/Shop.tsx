@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useRef, useState, useTransition, type FormEvent } from "react";
+import { useMemo, useRef, useState, useTransition, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { submitOrder, type SubmitOrderResult } from "@/app/commander/actions";
 import { eur } from "@/lib/format";
@@ -9,6 +9,8 @@ import { CATEGORIES, MEATS } from "@/lib/menu";
 import type { OrderingWindow } from "@/lib/time";
 import type { CartLine, Category, Product, Supplement } from "@/lib/types";
 import { setCart, useCart } from "./cart-store";
+import { Lightbox, type LightboxPhoto } from "./Lightbox";
+import { ProductImage } from "./ProductImage";
 
 type Mode = "browse" | "order";
 type Confirmation = Extract<SubmitOrderResult, { ok: true }>["order"];
@@ -18,9 +20,11 @@ interface Props {
   supplements: Supplement[];
   ordering: OrderingWindow;
   mode: Mode;
+  /** Contenu affiché sous la carte, à côté du panier (galerie de la pizzeria sur l'accueil). */
+  children?: ReactNode;
 }
 
-export function Shop({ products, supplements, ordering, mode }: Props) {
+export function Shop({ products, supplements, ordering, mode, children }: Props) {
   const router = useRouter();
   const lines = useCart();
   const [cat, setCat] = useState<Category>("tomate");
@@ -37,6 +41,7 @@ export function Shop({ products, supplements, ordering, mode }: Props) {
   const [invalid, setInvalid] = useState<Set<string>>(new Set());
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [pending, startTransition] = useTransition();
+  const [photo, setPhoto] = useState<LightboxPhoto | null>(null);
 
   const productById = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
   const supplementById = useMemo(() => new Map(supplements.map((s) => [s.id, s])), [supplements]);
@@ -121,66 +126,71 @@ export function Shop({ products, supplements, ordering, mode }: Props) {
 
   const category = CATEGORIES.find((c) => c.id === cat) ?? CATEGORIES[0]!;
   const items = products.filter((p) => p.category === cat);
+  const categoryHasPhoto = items.some((p) => p.image_path);
   const pizzaSupps = supplementsFor("tomate").filter((s) => s.available);
   const souffleSupps = supplementsFor("souffle").filter((s) => s.available);
 
   return (
     <>
       <div className="wrap shop">
-        <section aria-label="Carte">
-          <div className="tabs" role="group" aria-label="Rubriques de la carte">
-            {CATEGORIES.map((c) => (
-              <button key={c.id} type="button" aria-pressed={c.id === cat} onClick={() => setCat(c.id)}>
-                {c.name}
-              </button>
-            ))}
-          </div>
-
-          <div className="sec-h">
-            <h2 className={category.cls}>{category.name}</h2>
-            <span>{category.sub}</span>
-          </div>
-          <div className="grid">
-            {items.map((p) => (
-              <article key={p.id} className={`item${p.available ? "" : " off"}`}>
-                {p.tag && p.available && <span className="tag">{p.tag}</span>}
-                {!p.available && <span className="tag">Victime de son succès</span>}
-                <h3>{p.name}</h3>
-                <p className="ing">{p.description}</p>
-                <div className="row">
-                  <span className="price num">{eur(p.price)}</span>
-                  <button
-                    type="button"
-                    className="add"
-                    disabled={!p.available}
-                    aria-label={`Ajouter ${p.name}`}
-                    onClick={() => add(p)}
-                  >
-                    {p.available ? "Ajouter" : "Épuisé"}
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          {(pizzaSupps.length > 0 || souffleSupps.length > 0) && (
-            <div className="extras">
-              {pizzaSupps.length > 0 && (
-                <>
-                  <b>Suppléments pizza :</b>{" "}
-                  {pizzaSupps.map((s) => `${s.name.toLowerCase()} +${eur(s.price)}`).join(" · ")}
-                </>
-              )}
-              {souffleSupps.length > 0 && (
-                <>
-                  {pizzaSupps.length > 0 && " — "}
-                  <b>Soufflés :</b> {souffleSupps.map((s) => `${s.name.toLowerCase()} +${eur(s.price)}`).join(" · ")}
-                </>
-              )}{" "}
-              — à choisir dans le panier.
+        <div className="shop-main">
+          <section aria-label="Carte">
+            <div className="tabs" role="group" aria-label="Rubriques de la carte">
+              {CATEGORIES.map((c) => (
+                <button key={c.id} type="button" aria-pressed={c.id === cat} onClick={() => setCat(c.id)}>
+                  {c.name}
+                </button>
+              ))}
             </div>
-          )}
-        </section>
+
+            <div className="sec-h">
+              <h2 className={category.cls}>{category.name}</h2>
+              <span>{category.sub}</span>
+            </div>
+            <div className="grid">
+              {items.map((p) => (
+                <article key={p.id} className={`item${p.available ? "" : " off"}`}>
+                  <ProductImage product={p} onOpen={setPhoto} placeholder={categoryHasPhoto} />
+                  {p.tag && p.available && <span className="tag">{p.tag}</span>}
+                  {!p.available && <span className="tag">Victime de son succès</span>}
+                  <h3>{p.name}</h3>
+                  <p className="ing">{p.description}</p>
+                  <div className="row">
+                    <span className="price num">{eur(p.price)}</span>
+                    <button
+                      type="button"
+                      className="add"
+                      disabled={!p.available}
+                      aria-label={`Ajouter ${p.name}`}
+                      onClick={() => add(p)}
+                    >
+                      {p.available ? "Ajouter" : "Épuisé"}
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {(pizzaSupps.length > 0 || souffleSupps.length > 0) && (
+              <div className="extras">
+                {pizzaSupps.length > 0 && (
+                  <>
+                    <b>Suppléments pizza :</b>{" "}
+                    {pizzaSupps.map((s) => `${s.name.toLowerCase()} +${eur(s.price)}`).join(" · ")}
+                  </>
+                )}
+                {souffleSupps.length > 0 && (
+                  <>
+                    {pizzaSupps.length > 0 && " — "}
+                    <b>Soufflés :</b> {souffleSupps.map((s) => `${s.name.toLowerCase()} +${eur(s.price)}`).join(" · ")}
+                  </>
+                )}{" "}
+                — à choisir dans le panier.
+              </div>
+            )}
+          </section>
+          {children}
+          </div>
 
         <aside className={`cart${cartOpen ? " open" : ""}`} aria-label="Panier">
           <div className="cart-h">
@@ -385,6 +395,8 @@ export function Shop({ products, supplements, ordering, mode }: Props) {
           {toast}
         </div>
       )}
+
+      <Lightbox photo={photo} onClose={() => setPhoto(null)} />
     </>
   );
 }

@@ -192,3 +192,62 @@ a.cta{display:block;text-align:center;text-decoration:none}
 a.brand{color:inherit;text-decoration:none}
 button:disabled{cursor:not-allowed}
 .hp{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+
+/* ---------- Photos (carte, agrandissement, galerie) ---------- */
+.shop-main{min-width:0}
+.item-photo{position:relative;display:block;width:calc(100% + 28px);margin:-14px -14px 4px;aspect-ratio:4/3;overflow:hidden;border:0;padding:0;border-radius:calc(var(--r) - 1px) calc(var(--r) - 1px) 0 0;background:var(--counter-3)}
+button.item-photo{cursor:zoom-in}
+.item-photo img{object-fit:cover}
+.item-photo .illus{width:100%;height:100%;display:block}
+.item.off .item-photo{filter:grayscale(.8)}
+.ph-badge{position:absolute;left:8px;bottom:8px;z-index:1;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;background:rgba(18,16,16,.8);color:var(--ink-2);padding:3px 7px;border-radius:4px;pointer-events:none}
+.ph-badge-top{bottom:auto;top:8px}
+@media (hover:hover) and (prefers-reduced-motion:no-preference){
+  .item-photo img,.ph-open img{transition:transform .35s ease}
+  button.item-photo:hover img,.ph-open:hover img{transform:scale(1.04)}
+}
+
+.lightbox{border:0;padding:0;background:transparent;color:var(--ink);width:min(92vw,1100px);max-width:none;max-height:none;overflow:visible}
+.lightbox::backdrop{background:rgba(8,6,5,.88)}
+.lb-frame{position:relative;width:100%;height:min(76vh,820px)}
+.lb-frame img{object-fit:contain}
+.lb-bar{display:flex;gap:12px;align-items:center;justify-content:space-between;padding-top:12px}
+.lb-title{font-family:var(--display);font-weight:800;font-size:22px}
+.lb-cap{color:var(--ink-2);font-size:14px}
+
+.discover{margin-top:36px}
+.discover-intro{color:var(--ink-2);font-size:14px;margin:-6px 0 14px;max-width:62ch}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.ph-tile{position:relative;margin:0;aspect-ratio:3/4;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:var(--counter-3)}
+.ph-open{position:absolute;inset:0;border:0;padding:0;background:none;cursor:zoom-in}
+.ph-open img{object-fit:cover}
+.ph-cap{position:absolute;left:0;right:0;bottom:0;padding:32px 12px 10px;background:linear-gradient(transparent,rgba(10,8,7,.9));font-weight:600;font-size:14px;pointer-events:none}
+.ph-missing{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-3);font-size:14px}
+@media (max-width:720px){.photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- Espace photos (admin) ---------- */
+a.ghost{color:var(--ink);text-decoration:none;display:inline-flex;align-items:center}
+.adm-head{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:12px}
+.adm-head p{margin:0}
+.adm-head .add{min-height:44px}
+.stock .tabs{margin-bottom:12px}
+.adm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.adm-card .ing{flex:1}
+.adm-tall{aspect-ratio:3/4}
+.adm-actions{display:flex;flex-wrap:wrap;gap:8px}
+.adm-actions .add,.adm-actions .ghost,.adm-danger{min-height:44px}
+.adm-icon{min-width:44px;justify-content:center;padding:10px}
+.adm-danger{border:0;border-radius:10px;padding:10px 14px;font-weight:700;background:var(--hot);color:#fff}
+.adm-dialog{border:1px solid var(--line);border-radius:14px;background:var(--counter-2);color:var(--ink);padding:18px;width:min(92vw,560px);max-height:92vh;overflow:auto}
+.adm-dialog[open]{display:flex;flex-direction:column;gap:12px}
+.adm-dialog::backdrop{background:rgba(8,6,5,.8)}
+.adm-dialog h2{font-family:var(--display);font-size:24px;margin:0}
+.adm-preview{position:relative;flex:none;aspect-ratio:4/3;width:min(100%,calc(44vh * 4 / 3));margin-inline:auto;border-radius:var(--r);overflow:hidden;background:var(--counter-3);border:1px solid var(--line)}
+.adm-preview.adm-tall{aspect-ratio:3/4;width:min(100%,calc(44vh * 3 / 4))}
+.adm-preview img{object-fit:cover}
+.adm-hint{margin:-4px 0 0;color:var(--ink-3);font-size:13px}
+.adm-radio{border:1px solid var(--line);border-radius:8px;padding:8px 12px 10px;display:grid;gap:6px;font-size:14px}
+.adm-radio legend{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:0 4px}
+.adm-radio label{display:flex;gap:8px;align-items:center;min-height:32px}
+.adm-dialog .cta{flex:1}
+.ph-plain{background:repeating-linear-gradient(90deg,var(--counter-3) 0 17px,var(--counter-2) 17px 24px)}

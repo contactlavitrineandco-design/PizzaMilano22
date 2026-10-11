@@ -77,6 +77,26 @@ insert into public.products (name, description, category, price, sort_order, tag
 on conflict (name) do nothing;
 
 -- ---------------------------------------------------------------------
+-- Galerie « Découvrez notre pizzeria » : photos AUTHENTIQUES prises dans
+-- le restaurant (fichiers dans public/photos/etablissement, métadonnées
+-- et position GPS retirées). Remplaçables depuis /pizzeria/photos.
+-- ---------------------------------------------------------------------
+insert into public.gallery_photos (section, image_path, alt, caption, source, sort_order)
+select v.section, v.image_path, v.alt, v.caption, 'restaurant', v.sort_order
+from (values
+  ('interieur', '/photos/etablissement/neon-chef.webp',
+   'Enseigne néon blanche d''un chef pizzaïolo tenant une pizza, sur le mur en lattes de bois éclairé',
+   'Le chef en néon qui vous accueille', 10),
+  ('interieur', '/photos/etablissement/salle-comptoir.webp',
+   'La salle de la pizzeria : mur en lattes de bois, enseigne néon, frigo à boissons et comptoir de commande',
+   'La salle et le comptoir de retrait', 20),
+  ('interieur', '/photos/etablissement/frigo-boissons.webp',
+   'Frigo vitré rempli de canettes de sodas et de thés glacés, à côté du mur en lattes de bois',
+   'Les boissons fraîches', 30)
+) as v(section, image_path, alt, caption, sort_order)
+where not exists (select 1 from public.gallery_photos g where g.image_path = v.image_path);
+
+-- ---------------------------------------------------------------------
 -- Compte administrateur : à faire une fois le compte créé dans
 -- Supabase > Authentication > Users (voir README) :
 --

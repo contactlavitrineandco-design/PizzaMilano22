@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
@@ -23,11 +24,12 @@ interface Props {
   supplements: Supplement[];
   settings: RestaurantSettings;
   serverNow: number;
+  isAdmin: boolean;
 }
 
 const DONE_LABEL = "récupérée";
 
-export function Board({ orders, products, supplements, settings, serverNow }: Props) {
+export function Board({ orders, products, supplements, settings, serverNow, isAdmin }: Props) {
   const router = useRouter();
   const [now, setNow] = useState(serverNow);
   const [toast, setToast] = useState<string | null>(null);
@@ -122,6 +124,11 @@ export function Board({ orders, products, supplements, settings, serverNow }: Pr
               {settings.online_orders_open ? "Ouvertes" : "En pause"}
             </button>
           </div>
+          {isAdmin && (
+            <Link href="/pizzeria/photos" className="ghost adm-link">
+              Photos
+            </Link>
+          )}
           <form action={logout}>
             <button type="submit" className="ghost">
               Se déconnecter

@@ -19,6 +19,9 @@ export interface TimeRange {
 
 export type OpeningHours = Record<Weekday, TimeRange[]>;
 
+/** « restaurant » = vraie photo de Pizza Milano ; « illustration » = image qui ne vient pas du restaurant. */
+export type ImageSource = "restaurant" | "illustration";
+
 export interface Product {
   id: string;
   name: string;
@@ -29,6 +32,22 @@ export interface Product {
   sort_order: number;
   tag: string | null;
   to_confirm: boolean;
+  image_path: string | null;
+  image_alt: string | null;
+  image_source: ImageSource | null;
+}
+
+export type GallerySection = "interieur" | "exterieur" | "four" | "preparation" | "pizzas" | "equipe";
+
+export interface GalleryPhoto {
+  id: string;
+  section: GallerySection;
+  image_path: string;
+  alt: string;
+  caption: string;
+  source: ImageSource;
+  published: boolean;
+  sort_order: number;
 }
 
 export interface Supplement {

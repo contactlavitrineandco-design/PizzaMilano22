@@ -76,6 +76,7 @@ export default async function PizzeriaPage() {
       supplements={(supplements.data as Row[]).map(toSupplement)}
       settings={toSettings(settings.data as Row)}
       serverNow={now.getTime()}
+      isAdmin={role === "admin"}
     />
   );
 }
