@@ -77,6 +77,23 @@ insert into public.products (name, description, category, price, sort_order, tag
 on conflict (name) do nothing;
 
 -- ---------------------------------------------------------------------
+-- Vraies photos de pizzas du restaurant (provisoires, basse résolution) :
+-- recadrées depuis la fiche Uber Eats du restaurant, bouton et badge de la
+-- plateforme effacés. À remplacer par les fichiers originaux depuis
+-- /pizzeria/photos. Ne s'applique que si le produit n'a pas déjà une photo.
+-- ---------------------------------------------------------------------
+update public.products p
+set image_path = v.image_path, image_alt = v.alt, image_source = 'restaurant', image_updated_at = now()
+from (values
+  ('La Raclette',  '/photos/pizzas/raclette.webp',  'Pizza Raclette sur une assiette à pois : jambon, pomme de terre, fromage à raclette fondu et oignons rouges'),
+  ('La Saumon',    '/photos/pizzas/saumon.webp',    'Pizza Saumon sur base crème, larges tranches de saumon et herbes, pâte dorée'),
+  ('La Chorizo',   '/photos/pizzas/chorizo.webp',   'Pizza Chorizo sur sauce tomate : rondelles de chorizo, pomme de terre et fromage fondu'),
+  ('La Neptune',   '/photos/pizzas/neptune.webp',   'Pizza Neptune : thon, poivrons rouges et verts, oignons rouges et olives noires sur sauce tomate'),
+  ('La Cannibale', '/photos/pizzas/cannibale.webp', 'Pizza Cannibale sur base crème : poulet, viande hachée, merguez et lamelles de jambon')
+) as v(name, image_path, alt)
+where p.name = v.name and p.image_path is null;
+
+-- ---------------------------------------------------------------------
 -- Galerie « Découvrez notre pizzeria » : photos AUTHENTIQUES prises dans
 -- le restaurant (fichiers dans public/photos/etablissement, métadonnées
 -- et position GPS retirées). Remplaçables depuis /pizzeria/photos.

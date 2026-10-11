@@ -258,7 +258,7 @@ Ces données sont en base mais **ne sont pas validées commercialement**. Les pr
 
 **Photos**
 - [ ] Les 3 photos de la galerie (néon, salle, frigo) ont été prises sur place. Il faut l'accord du restaurant pour les publier. Le comptoir porte un autocollant « Pizza Zone ».
-- [ ] Les photos visibles sur Uber Eats n'ont **pas** été reprises. Les captures sont trop petites, avec des boutons par-dessus, et les droits ne sont pas clairs (photographe de la plateforme ou du restaurant). La photo « La 5 fromages » d'Uber Eats montre d'ailleurs d'autres pizzas. Demandez au restaurant les fichiers originaux, puis importez-les dans l'espace photos.
+- [ ] **5 vraies photos de pizzas** (Raclette, Saumon, Chorizo, Neptune, Cannibale) viennent de la fiche Uber Eats du restaurant. Elles ont été recadrées, et le bouton « + » et le badge de la plateforme ont été effacés. Elles sont **provisoires et en basse résolution** (environ 600 px). Il faut confirmer que le restaurant en détient les droits : si un photographe de la plateforme les a prises, elles peuvent lui appartenir. Demandez les fichiers originaux et remplacez-les dans `/pizzeria/photos`. La photo « 5 fromages » d'Uber Eats n'a pas été reprise : elle montre d'autres pizzas.
 
 **Produits volontairement non ajoutés** (vus sur la caisse ou dans le frigo) : Indienne (12 €), Hawaï (2 €), Dada, Schweppes.
 
