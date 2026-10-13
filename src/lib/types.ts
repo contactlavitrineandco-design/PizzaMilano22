@@ -62,7 +62,12 @@ export interface Supplement {
 export interface RestaurantSettings {
   id: number;
   restaurant_name: string;
-  address: string | null;
+  address: string | null; // numéro et rue
+  postal_code: string | null;
+  city: string | null;
+  google_maps_url: string | null;
+  latitude: number | null;
+  longitude: number | null;
   phone: string | null;
   online_orders_open: boolean;
   opening_hours: OpeningHours;

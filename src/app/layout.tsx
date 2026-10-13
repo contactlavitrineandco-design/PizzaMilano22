@@ -1,10 +1,29 @@
 import type { Metadata, Viewport } from "next";
 import { Header } from "@/components/Header";
+import { DEFAULT_CITY, siteUrl } from "@/lib/site";
+import { alegreya, figtree, jetbrainsMono } from "./fonts";
 import "./globals.css";
 
+const description = `Pizzeria à emporter à ${DEFAULT_CITY} : pizzas base tomate ou crème, soufflés et boissons fraîches. Commandez en ligne, retirez et payez au comptoir.`;
+
 export const metadata: Metadata = {
-  title: "Pizza Milano",
-  description: "Pizzeria à emporter : commandez en ligne et récupérez au comptoir.",
+  metadataBase: new URL(siteUrl()),
+  title: {
+    default: `Pizza Milano · Pizzeria à emporter à ${DEFAULT_CITY}`,
+    template: "%s · Pizza Milano",
+  },
+  description,
+  applicationName: "Pizza Milano",
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    siteName: "Pizza Milano",
+    title: `Pizza Milano · Pizzeria à emporter à ${DEFAULT_CITY}`,
+    description,
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Enseigne néon du chef pizzaïolo de Pizza Milano" }],
+  },
+  twitter: { card: "summary_large_image" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
@@ -17,15 +36,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,700;0,800;0,900;1,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
-        />
-      </head>
+    <html lang="fr" className={`${alegreya.variable} ${figtree.variable} ${jetbrainsMono.variable}`}>
       <body>
         <Header />
         {children}

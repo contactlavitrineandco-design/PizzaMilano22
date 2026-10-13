@@ -9,15 +9,16 @@ export interface HeroPrices {
 
 const euro = (v: number) => (Number.isInteger(v) ? `${v} €` : eur(v));
 
-export function Hero({ banner, prices }: { banner: string | null; prices: HeroPrices }) {
+export function Hero({ banner, prices, city }: { banner: string | null; prices: HeroPrices; city: string }) {
   return (
     <section className="hero slats">
       <div className="wrap">
         <div className="hero-card">
-          <div className="eyebrow">Pizzas · Soufflés · Boissons fraîches</div>
-          <h1>
+          {/* H1 = nom + activité + ville (référencement local) ; même apparence que l'ancien sur-titre */}
+          <h1 className="eyebrow">Pizza Milano · Pizzeria à emporter à {city}</h1>
+          <p className="hero-title">
             Commandez, on enfourne, <em>vous passez récupérer.</em>
-          </h1>
+          </p>
           <p>
             Choisissez vos pizzas sur la carte, indiquez l&apos;heure de retrait et réglez au comptoir. Votre commande
             arrive directement sur la tablette du pizzaïolo.

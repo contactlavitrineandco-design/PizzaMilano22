@@ -47,10 +47,7 @@ export function Shop({ products, supplements, ordering, mode, children }: Props)
   const supplementById = useMemo(() => new Map(supplements.map((s) => [s.id, s])), [supplements]);
 
   // Les produits passés en rupture (ou supprimés) disparaissent du panier.
-  const validLines = useMemo(
-    () => lines.filter((l) => productById.get(l.productId)?.available),
-    [lines, productById],
-  );
+  const validLines = useMemo(() => lines.filter((l) => productById.get(l.productId)?.available), [lines, productById]);
 
   const pickup = ordering.slots.includes(pickupChoice) ? pickupChoice : (ordering.slots[0] ?? "");
 
@@ -124,9 +121,6 @@ export function Shop({ products, supplements, ordering, mode, children }: Props)
     });
   }
 
-  const category = CATEGORIES.find((c) => c.id === cat) ?? CATEGORIES[0]!;
-  const items = products.filter((p) => p.category === cat);
-  const categoryHasPhoto = items.some((p) => p.image_path);
   const pizzaSupps = supplementsFor("tomate").filter((s) => s.available);
   const souffleSupps = supplementsFor("souffle").filter((s) => s.available);
 
@@ -143,33 +137,42 @@ export function Shop({ products, supplements, ordering, mode, children }: Props)
               ))}
             </div>
 
-            <div className="sec-h">
-              <h2 className={category.cls}>{category.name}</h2>
-              <span>{category.sub}</span>
-            </div>
-            <div className="grid">
-              {items.map((p) => (
-                <article key={p.id} className={`item${p.available ? "" : " off"}`}>
-                  <ProductImage product={p} onOpen={setPhoto} placeholder={categoryHasPhoto} />
-                  {p.tag && p.available && <span className="tag">{p.tag}</span>}
-                  {!p.available && <span className="tag">Victime de son succès</span>}
-                  <h3>{p.name}</h3>
-                  <p className="ing">{p.description}</p>
-                  <div className="row">
-                    <span className="price num">{eur(p.price)}</span>
-                    <button
-                      type="button"
-                      className="add"
-                      disabled={!p.available}
-                      aria-label={`Ajouter ${p.name}`}
-                      onClick={() => add(p)}
-                    >
-                      {p.available ? "Ajouter" : "Épuisé"}
-                    </button>
+            {/* Toutes les rubriques sont dans la page ; les onglets masquent les autres. */}
+            {CATEGORIES.map((category) => {
+              const items = products.filter((p) => p.category === category.id);
+              const categoryHasPhoto = items.some((p) => p.image_path);
+              return (
+                <div key={category.id} hidden={category.id !== cat}>
+                  <div className="sec-h">
+                    <h2 className={category.cls}>{category.name}</h2>
+                    <span>{category.sub}</span>
                   </div>
-                </article>
-              ))}
-            </div>
+                  <div className="grid">
+                    {items.map((p) => (
+                      <article key={p.id} className={`item${p.available ? "" : " off"}`}>
+                        <ProductImage product={p} onOpen={setPhoto} placeholder={categoryHasPhoto} />
+                        {p.tag && p.available && <span className="tag">{p.tag}</span>}
+                        {!p.available && <span className="tag">Victime de son succès</span>}
+                        <h3>{p.name}</h3>
+                        <p className="ing">{p.description}</p>
+                        <div className="row">
+                          <span className="price num">{eur(p.price)}</span>
+                          <button
+                            type="button"
+                            className="add"
+                            disabled={!p.available}
+                            aria-label={`Ajouter ${p.name}`}
+                            onClick={() => add(p)}
+                          >
+                            {p.available ? "Ajouter" : "Épuisé"}
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
 
             {(pizzaSupps.length > 0 || souffleSupps.length > 0) && (
               <div className="extras">
@@ -190,7 +193,7 @@ export function Shop({ products, supplements, ordering, mode, children }: Props)
             )}
           </section>
           {children}
-          </div>
+        </div>
 
         <aside className={`cart${cartOpen ? " open" : ""}`} aria-label="Panier">
           <div className="cart-h">
@@ -222,11 +225,19 @@ export function Shop({ products, supplements, ordering, mode, children }: Props)
                   <div className="line" key={`${l.productId}-${l.supplementId}-${l.meat}-${k}`}>
                     <span className="n">{p.name}</span>
                     <div className="qty">
-                      <button type="button" aria-label="Retirer un" onClick={() => updateLine(k, { quantity: l.quantity - 1 })}>
+                      <button
+                        type="button"
+                        aria-label="Retirer un"
+                        onClick={() => updateLine(k, { quantity: l.quantity - 1 })}
+                      >
                         −
                       </button>
                       <span className="num">{l.quantity}</span>
-                      <button type="button" aria-label="Ajouter un" onClick={() => updateLine(k, { quantity: l.quantity + 1 })}>
+                      <button
+                        type="button"
+                        aria-label="Ajouter un"
+                        onClick={() => updateLine(k, { quantity: l.quantity + 1 })}
+                      >
                         +
                       </button>
                     </div>

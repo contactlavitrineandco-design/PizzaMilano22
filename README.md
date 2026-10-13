@@ -31,7 +31,7 @@ npm install
 **Option A : projet Supabase en ligne (le plus simple)**
 
 1. Créez un projet sur supabase.com (région Europe, par exemple Paris ou Francfort).
-2. Dans **SQL Editor**, exécutez dans l'ordre `supabase/migrations/20261008120000_init.sql`, puis `supabase/migrations/20261011120000_photos.sql` (qui crée aussi le stockage des photos), puis `supabase/seed.sql`.
+2. Dans **SQL Editor**, exécutez dans l'ordre les trois fichiers de `supabase/migrations/` (`…_init.sql`, `…_photos.sql`, qui crée aussi le stockage des photos, puis `…_seo.sql`), puis `supabase/seed.sql`.
    Avec la CLI, c'est équivalent à : `npx supabase link --project-ref <ref>` puis `npm run db:push`, et le seed dans le SQL Editor.
 3. Dans **Authentication > Sign In / Providers**, **désactivez les inscriptions** (« Allow new users to sign up »). Seuls les comptes que vous créez vous-même doivent exister.
 
@@ -57,6 +57,7 @@ Remplissez avec **Project Settings > API** :
 | ------------------------------- | ------------------------------------- | --------- |
 | `NEXT_PUBLIC_SUPABASE_URL`      | navigateur + serveur                  | non       |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | navigateur + serveur (clé « anon » ou « publishable ») | non |
+| `NEXT_PUBLIC_SITE_URL`          | adresse publique du site, ex. `https://www.mondomaine.fr` (balises canoniques, sitemap, Google) | non |
 | `SUPABASE_SERVICE_ROLE_KEY`     | **serveur uniquement** (création des commandes) — clé « service_role » ou « secret » | **oui** |
 
 ### 4. Créer le compte administrateur du restaurant
@@ -224,6 +225,34 @@ Aucune banque d'images ni API de génération d'images n'est branchée dans le p
 2. **Banques d'images libres** (Unsplash, Pexels : usage commercial gratuit, sans attribution obligatoire, selon leurs licences au moment du téléchargement). Elles ont rarement la recette exacte. À marquer « Image d'illustration ».
 3. **Images générées par IA** : possibles avec un outil externe (ChatGPT, Midjourney, Canva…). Vérifiez ses conditions d'utilisation commerciale et son coût, puis importez l'image comme « Image d'illustration ».
 
+### Référencement (SEO)
+
+- **Page indexée** : seulement l'accueil `/`, qui contient la carte complète, la galerie et les infos pratiques. `/commander` reprend la même carte, donc elle est en `noindex, follow` pour éviter le contenu dupliqué. `/login` et `/pizzeria` sont en `noindex`.
+- **Métadonnées** : titre « Pizza Milano · Pizzeria à emporter à Saint-Brieuc », description, balise canonique et image de partage `public/og.jpg` (layout et pages).
+- **`/sitemap.xml` et `/robots.txt`** sont générés par `src/app/sitemap.ts` et `src/app/robots.ts`. Ils utilisent `NEXT_PUBLIC_SITE_URL`.
+- **H1** : « Pizza Milano · Pizzeria à emporter à Saint-Brieuc » (même apparence que l'ancien sur-titre). La grande phrase d'accroche est un paragraphe.
+- **Carte** : les 4 rubriques sont dans le HTML et les onglets ne font que filtrer. Avant, Google ne voyait que la base tomate.
+- **Données structurées** Schema.org `Restaurant` + `Menu` (prix, disponibilités, photos réelles) dans `src/lib/structured-data.ts`. Elles sont construites **uniquement à partir de la base** : adresse, téléphone, coordonnées GPS et lien Maps ne sont publiés que s'ils sont renseignés. Les horaires ne sont publiés que si `opening_hours_provisional = false`.
+- **Infos pratiques** en bas de page (`src/components/PracticalInfo.tsx`), avec les mêmes règles. Elles doivent être identiques à la fiche Google Business Profile.
+- **Polices** servies par le site (`src/app/fonts/`, préchargées, plus d'appel à Google Fonts) : même rendu, chargement plus rapide.
+
+**À remplir avant la mise en ligne** (Supabase > SQL Editor), avec les vraies informations du restaurant :
+
+```sql
+update public.restaurant_settings set
+  address = 'numéro et rue',
+  postal_code = '22000',
+  city = 'Saint-Brieuc',
+  phone = '02 xx xx xx xx',
+  google_maps_url = 'https://maps.app.goo.gl/…',   -- lien « Partager » de la fiche Google
+  latitude = null, longitude = null,                -- facultatif
+  opening_hours = '{…}',                            -- vrais horaires (format plus haut)
+  opening_hours_provisional = false
+where id = 1;
+```
+
+**Vérifier après déploiement** : `https://votre-domaine/robots.txt`, `/sitemap.xml`, le [test des résultats enrichis](https://search.google.com/test/rich-results) sur l'accueil et [PageSpeed Insights](https://pagespeed.web.dev/).
+
 ---
 
 ## À confirmer avec le restaurant
@@ -234,7 +263,7 @@ Ces données sont en base mais **ne sont pas validées commercialement**. Les pr
 - [ ] **Horaires d'ouverture : PROVISOIRES.** Le seed met tous les jours 11:00–14:00 et 18:00–22:30 (`opening_hours_provisional = true`). Ce ne sont pas les horaires du restaurant.
 - [ ] Délai minimum de préparation (20 min) et pas des créneaux (10 min).
 
-**Coordonnées**
+**Coordonnées (indispensables au référencement local)**
 - [ ] Adresse et téléphone du restaurant (vides dans `restaurant_settings`).
 - [ ] Nom du restaurant : « Pizza Milano ». La plaque du comptoir indique « Pizza Zone ».
 
