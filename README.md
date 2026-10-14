@@ -34,7 +34,7 @@ npm install
 **Option A : projet Supabase en ligne (le plus simple)**
 
 1. Créez un projet sur supabase.com (région Europe, par exemple Paris ou Francfort).
-2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (dans l'ordre des noms : `…_init`, `…_photos` qui crée aussi le stockage des photos, `…_seo`, `…_photos_hd`, `…_photos_ia`, `…_annulation`, `…_photos_nettes_legal`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
+2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (dans l'ordre des noms : `…_init`, `…_photos` qui crée aussi le stockage des photos, `…_seo`, `…_photos_hd`, `…_photos_ia`, `…_annulation`, `…_photos_nettes_legal`, `…_coordonnees_galerie`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
    Avec la CLI, c'est équivalent à : `npx supabase link --project-ref <ref>` puis `npm run db:push`, et le seed dans le SQL Editor.
 3. Dans **Authentication > Sign In / Providers**, **désactivez les inscriptions** (« Allow new users to sign up »). Seuls les comptes que vous créez vous-même doivent exister.
 
@@ -198,6 +198,10 @@ Pour modifier les horaires, ouvrez **Table Editor > restaurant_settings** et éd
 - Le point d'extension est documenté dans `src/lib/orders/create.ts`. Rien n'est développé tant que le produit SumUp utilisé par le restaurant n'est pas identifié.
 
 
+### Découvrez notre pizzeria et carte
+
+La section présente la pizzeria en quelques lignes, affiche la première photo de la galerie (aujourd'hui une vraie Neptune du restaurant) puis une carte Google Maps. La carte ne se charge **qu'après un clic** sur « Afficher la carte » : aucune requête vers Google avant, ce qui évite un bandeau cookies. Le lien « itinéraire » ouvre la fiche Google de la pizzeria.
+
 ### Photos
 
 **Ce que voient les clients**
@@ -309,7 +313,9 @@ Ces données sont en base mais **ne sont pas validées commercialement**. Les pr
 - [ ] Délai minimum de préparation (20 min) et pas des créneaux (10 min).
 
 **Coordonnées (indispensables au référencement local)**
-- [ ] Adresse trouvée sur Mappy pour « Milano Pizza » : **3 rue du Maréchal Foch, 22000 Saint-Brieuc**. À confirmer avant de l'enregistrer (le nom diffère légèrement, et les horaires Mappy semblent incohérents).
+- [x] Adresse et téléphone repris de la fiche Google Maps « Milano pizza » (14/10/2026) : **3 rue du Maréchal Foch, 22000 Saint-Brieuc, 06 50 64 73 89**. Enregistrés par la migration `…_coordonnees_galerie` et le seed.
+- [ ] **Nom** : la fiche Google dit « Milano pizza », le site dit « Pizza Milano ». Pour Google, il faut le même nom partout.
+- [ ] **Horaires** : ceux de la fiche Google paraissent erronés (lundi 9 h–minuit, mardi minuit–17 h…). Ils ne sont pas repris : donner les vrais horaires.
 - [ ] Nom exact du compte Instagram (« pizza milano 22 »), pour `instagram_url`.
 - [ ] Adresse et téléphone du restaurant (vides dans `restaurant_settings`).
 - [ ] Nom du restaurant : « Pizza Milano ». La plaque du comptoir indique « Pizza Zone ».

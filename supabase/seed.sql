@@ -13,7 +13,7 @@ insert into public.restaurant_settings
   (id, restaurant_name, address, phone, online_orders_open, opening_hours,
    opening_hours_provisional, min_prep_minutes, slot_interval_minutes)
 values (
-  1, 'Pizza Milano', null, null, true,
+  1, 'Pizza Milano', '3 rue du Maréchal Foch', '06 50 64 73 89', true,
   '{
     "monday":    [{"open": "11:00", "close": "14:00"}, {"open": "18:00", "close": "22:30"}],
     "tuesday":   [{"open": "11:00", "close": "14:00"}, {"open": "18:00", "close": "22:30"}],
@@ -26,6 +26,16 @@ values (
   true, 20, 10
 )
 on conflict (id) do nothing;
+
+-- Coordonnées d'après la fiche Google Maps « Milano pizza » (14/10/2026)
+update public.restaurant_settings set
+  postal_code = coalesce(postal_code, '22000'),
+  city = coalesce(city, 'Saint-Brieuc'),
+  latitude = coalesce(latitude, 48.515201),
+  longitude = coalesce(longitude, -2.761540),
+  google_maps_url = coalesce(google_maps_url,
+    'https://www.google.com/maps/search/?api=1&query=Milano%20pizza&query_place_id=ChIJT6U7b0IdDkgRZO3uOmvx_Lg')
+where id = 1;
 
 -- ---------------------------------------------------------------------
 -- Suppléments (menu : « Supplément : Œufs, Fromage 0,50 €, Viande 1 € »,
@@ -113,13 +123,10 @@ where p.name = v.name and p.image_path is null;
 -- et position GPS retirées). Remplaçables depuis /pizzeria/photos.
 -- ---------------------------------------------------------------------
 insert into public.gallery_photos (section, image_path, alt, caption, source, sort_order)
-select v.section, v.image_path, v.alt, v.caption, 'restaurant', v.sort_order
-from (values
-  ('interieur', '/photos/etablissement/neon-chef.webp',
-   'Enseigne néon blanche d''un chef pizzaïolo tenant une pizza, sur le mur en lattes de bois éclairé',
-   'Le chef en néon qui vous accueille', 10)
-) as v(section, image_path, alt, caption, sort_order)
-where not exists (select 1 from public.gallery_photos g where g.image_path = v.image_path);
+select 'pizzas', '/photos/carte/neptune.webp',
+       'Pizza Neptune du restaurant : thon, poivrons, oignons rouges et olives noires, devant le mur en lattes de bois',
+       'Tout juste sortie du four', 'restaurant', 10
+where not exists (select 1 from public.gallery_photos where image_path = '/photos/carte/neptune.webp');
 
 -- ---------------------------------------------------------------------
 -- Compte administrateur : à faire une fois le compte créé dans

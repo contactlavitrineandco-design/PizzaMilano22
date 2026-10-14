@@ -92,7 +92,8 @@ export default async function Confidentialite() {
           navigateur votre panier et le numéro de votre dernière commande, pour que vous puissiez les retrouver. Ces
           informations sont strictement nécessaires au service demandé et ne nécessitent donc pas de consentement. Un cookie de
           connexion est utilisé uniquement dans l&apos;espace réservé au personnel. Les polices de caractères sont hébergées
-          par le site lui-même.
+          par le site lui-même. La carte Google Maps n&apos;est chargée que si vous cliquez sur « Afficher la carte » :
+          Google peut alors déposer ses propres cookies, selon sa politique de confidentialité.
         </p>
 
         <h2>Sécurité</h2>

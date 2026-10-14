@@ -33,7 +33,7 @@ export default async function HomePage() {
           showMenuLink={data.ordering.canOrder}
         />
         <Shop products={data.products} supplements={data.supplements} ordering={data.ordering} mode="browse">
-          <PizzeriaGallery photos={gallery} />
+          <PizzeriaGallery photos={gallery} settings={data.settings} />
         </Shop>
       </main>
       <PracticalInfo settings={data.settings} city={data.city} pizzaFrom={data.prices.pizzaFrom} showOrderLink />
