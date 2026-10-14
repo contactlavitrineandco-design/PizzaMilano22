@@ -115,7 +115,10 @@ from (values
   ('La Mexicaine',  '/photos/carte/mexicaine.webp',  'Pizza Mexicaine : merguez, viande hachée et oignons sur sauce tomate'),
   ('La Chicken',    '/photos/carte/chicken.webp',    'Pizza Chicken : poulet, champignons et œufs sur sauce tomate'),
   ('La Tartiflette', '/photos/carte/tartiflette.webp', 'Pizza Tartiflette : crème, lardons, pomme de terre, reblochon fondu et oignons'),
-  ('La Burrata',     '/photos/carte/burrata.webp',     'Pizza Burrata : crème, burrata entière au centre, tomates cerises et jambon')
+  ('La Burrata',     '/photos/carte/burrata.webp',     'Pizza Burrata : crème, burrata entière au centre, tomates cerises et jambon'),
+  ('La 4 Fromages',   '/photos/carte/4-fromages.webp',   'Pizza 4 Fromages : sauce tomate, mozzarella, brie, parmesan et chèvre'),
+  ('La Végétarienne', '/photos/carte/vegetarienne.webp', 'Pizza Végétarienne : champignons, poivrons, oignons et olives noires sur sauce tomate'),
+  ('La Paysanne',     '/photos/carte/paysanne.webp',     'Pizza Paysanne : lardons, pomme de terre et oignons sur sauce tomate')
 ) as v(name, image_path, alt)
 where p.name = v.name and p.image_path is null;
 

@@ -34,7 +34,7 @@ npm install
 **Option A : projet Supabase en ligne (le plus simple)**
 
 1. Créez un projet sur supabase.com (région Europe, par exemple Paris ou Francfort).
-2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (dans l'ordre des noms : `…_init`, `…_photos` qui crée aussi le stockage des photos, `…_seo`, `…_photos_hd`, `…_photos_ia`, `…_annulation`, `…_photos_nettes_legal`, `…_coordonnees_galerie`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
+2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (dans l'ordre des noms : `…_init`, `…_photos` qui crée aussi le stockage des photos, `…_seo`, `…_photos_hd`, `…_photos_ia`, `…_annulation`, `…_photos_nettes_legal`, `…_coordonnees_galerie`, `…_photos_tartiflette_burrata`, `…_photos_4fromages_vege_paysanne`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
    Avec la CLI, c'est équivalent à : `npx supabase link --project-ref <ref>` puis `npm run db:push`, et le seed dans le SQL Editor.
 3. Dans **Authentication > Sign In / Providers**, **désactivez les inscriptions** (« Allow new users to sign up »). Seuls les comptes que vous créez vous-même doivent exister.
 
@@ -237,7 +237,7 @@ La section présente la pizzeria en quelques lignes, affiche la première photo 
 - Les 5 vraies photos (Raclette, Saumon, Chorizo, Neptune, Cannibale) ont été agrandies par super-résolution (modèle EDSR ×4, 1200 × 900) : fichiers `*-hd.webp`. La migration `…_photos_hd.sql` bascule la base sur ces fichiers. Le gain est réel mais limité, parce que les originaux Uber Eats ne font qu'environ 300 px.
 - 4 photos d'illustration réalistes ont été générées avec Canva IA, dans le style des vraies photos : Margherita, Milano, Reine, Boursalino. Elles sont dans le compte Canva, pas dans le projet, car le téléchargement depuis Canva n'était pas possible depuis l'environnement de développement. Pour les mettre en ligne : les ouvrir dans Canva, les télécharger en JPG, puis `/pizzeria/photos` > la pizza > « Ajouter une photo », origine **« Image d'illustration »**. Elles s'afficheront avec la mention « Photo d'illustration ».
 - Mise à jour : 7 photos IA sont maintenant **intégrées au site** (`public/photos/pizzas-ia/`, agrandies par super-résolution) : Margherita, Milano, Reine, Boursalino, 4 Saisons, Mexicaine, Chicken. Elles portent la mention « Photo d'illustration ».
-- Il reste 7 pizzas sans photo (4 Fromages, Végétarienne, Paysanne, 5 Fromages, Chèvre Miel, Tartiflette, Burrata). Elles affichent un emplacement neutre : les illustrations dessinées ont été retirées pour un rendu plus propre. Crédits Canva épuisés à nouveau.
+- Il reste 2 pizzas sans photo (5 Fromages, Chèvre Miel). Elles affichent un emplacement neutre. Tartiflette, Burrata, 4 Fromages, Végétarienne et Paysanne ont reçu une photo d'illustration générée par IA (Canva), sur le même fond que les autres, signalée « Photo d'illustration ».
 - La photo du frigo a été retirée de la galerie.
 
 **Obtenir des images pour les pizzas sans photo**
