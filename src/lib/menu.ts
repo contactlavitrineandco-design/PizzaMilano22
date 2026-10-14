@@ -18,9 +18,10 @@ export const STATUS_FLOW: { id: Exclude<OrderStatus, "done">; name: string; colo
   { id: "ready", name: "Prêtes", color: "var(--ok)", button: "Récupérée" },
 ];
 
-export const STATUS_ORDER: OrderStatus[] = ["new", "prep", "ready", "done"];
+export const STATUS_ORDER: OrderStatus[] = ["new", "prep", "ready", "done"]; // « cancelled » est hors du circuit
 
 export function nextStatus(s: OrderStatus): OrderStatus | null {
+  if (s === "cancelled") return null;
   const i = STATUS_ORDER.indexOf(s);
   return i >= 0 && i < STATUS_ORDER.length - 1 ? STATUS_ORDER[i + 1]! : null;
 }

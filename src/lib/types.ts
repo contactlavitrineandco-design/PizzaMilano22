@@ -1,5 +1,5 @@
 export type Category = "tomate" | "creme" | "souffle" | "boisson";
-export type OrderStatus = "new" | "prep" | "ready" | "done";
+export type OrderStatus = "new" | "prep" | "ready" | "done" | "cancelled";
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
 export type StaffRole = "admin" | "staff";
 
@@ -100,6 +100,7 @@ export interface Order {
   payment_status: PaymentStatus;
   total: number;
   created_at: string;
+  cancelled_by: "client" | "restaurant" | null;
   items: OrderItem[];
 }
 

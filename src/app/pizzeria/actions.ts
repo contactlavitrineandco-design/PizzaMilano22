@@ -6,7 +6,7 @@ import type { OrderStatus } from "@/lib/types";
 export type ActionResult = { ok: true } | { ok: false; message: string };
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const STATUSES: OrderStatus[] = ["new", "prep", "ready", "done"];
+const STATUSES: OrderStatus[] = ["new", "prep", "ready", "done", "cancelled"];
 
 /**
  * Chaque action passe par une fonction SQL qui vérifie elle-même que le
@@ -18,6 +18,7 @@ async function callRpc(fn: string, args: Record<string, unknown>): Promise<Actio
   const { error } = await supabase.rpc(fn, args);
   if (!error) return { ok: true };
   if (error.message === "FORBIDDEN") return { ok: false, message: "Session expirée ou accès refusé. Reconnectez-vous." };
+  if (error.message === "ORDER_CANCELLED") return { ok: false, message: "Cette commande a été annulée." };
   console.error(`[pizzeria] ${fn}`, error);
   return { ok: false, message: "La modification n'a pas été enregistrée. Réessayez." };
 }

@@ -5,16 +5,16 @@ import { useState } from "react";
 import { defaultProductAlt, imageUrl, isPizza } from "@/lib/images";
 import type { Product } from "@/lib/types";
 import type { LightboxPhoto } from "./Lightbox";
-import { PizzaIllustration } from "./PizzaIllustration";
+import { PhotoPlaceholder } from "./PhotoPlaceholder";
 
 export const CARD_SIZES = "(max-width: 720px) 92vw, (max-width: 980px) 46vw, 300px";
 
 /**
  * Photo d'un produit sur la carte, par ordre de priorité :
  * 1. la photo enregistrée (vraie photo, ou image marquée « Photo d'illustration ») ;
- * 2. pour une pizza, l'illustration dessinée d'après ses ingrédients (mention « Illustration ») ;
- * 3. sinon un panneau neutre si d'autres produits de la rubrique ont une photo (cartes de même hauteur),
- *    ou rien (la carte reste en texte, comme avant).
+ * 2. pour une pizza sans photo, un emplacement sobre (en attendant une vraie photo) ;
+ * 3. pour un autre produit, le même emplacement si d'autres produits de la rubrique ont une photo
+ *    (cartes de même hauteur), sinon rien (la carte reste en texte).
  * Si la photo ne se charge pas, on bascule automatiquement sur 2 ou 3.
  */
 export function ProductImage({
@@ -47,20 +47,7 @@ export function ProductImage({
     );
   }
 
-  if (isPizza(product)) {
-    return (
-      <div className="item-photo">
-        <PizzaIllustration name={product.name} description={product.description} category={product.category} />
-        <span className="ph-badge">Illustration</span>
-      </div>
-    );
-  }
-
-  if (placeholder) {
-    return (
-      <div className="item-photo ph-plain" aria-hidden="true" />
-    );
-  }
+  if (isPizza(product) || placeholder) return <PhotoPlaceholder />;
 
   return null;
 }

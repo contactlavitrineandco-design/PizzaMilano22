@@ -10,6 +10,8 @@ export interface OrderConfirmation {
   total: number;
   pickup: string; // "HH:MM"
   name: string;
+  /** Jeton secret de suivi / annulation, donné uniquement à ce client. */
+  token: string;
 }
 
 export type CreateOrderResult =
@@ -79,8 +81,22 @@ export async function createOrder(input: OrderInput): Promise<CreateOrderResult>
   const row = (Array.isArray(data) ? data[0] : data) as { order_number: number; total: number | string } | undefined;
   if (!row) return fail("UNKNOWN");
 
+  // Jeton de suivi de cette commande (numéro unique pour la journée à Paris)
+  const { data: tokenRow } = await db
+    .from("orders")
+    .select("cancel_token")
+    .eq("order_date", window.today)
+    .eq("order_number", row.order_number)
+    .single();
+
   return {
     ok: true,
-    order: { number: Number(row.order_number), total: Number(row.total), pickup: input.pickup, name: input.name },
+    order: {
+      number: Number(row.order_number),
+      total: Number(row.total),
+      pickup: input.pickup,
+      name: input.name,
+      token: tokenRow ? String(tokenRow.cancel_token) : "",
+    },
   };
 }

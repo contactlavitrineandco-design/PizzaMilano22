@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { PizzaIllustration } from "@/components/PizzaIllustration";
+import { PhotoPlaceholder } from "@/components/PhotoPlaceholder";
 import { prepareImage, type PreparedImage } from "@/lib/image-prep";
 import { defaultProductAlt, GALLERY_SECTIONS, imageUrl, isPizza, PHOTO_BUCKET } from "@/lib/images";
 import { CATEGORIES } from "@/lib/menu";
@@ -101,8 +101,8 @@ export function PhotoManager({ products, gallery }: { products: Product[]; galle
         <section className="stock" aria-labelledby="adm-menu">
           <h2 id="adm-menu">Photos de la carte</h2>
           <p>
-            Sans photo, une pizza affiche une illustration dessinée d&apos;après ses ingrédients, marquée
-            « Illustration ». Ajoutez vos vraies photos pour la remplacer.
+            Sans photo, une pizza affiche un emplacement neutre. Ajoutez vos vraies photos : elles remplacent
+            aussi les « Photos d&apos;illustration » générées.
           </p>
           <div className="tabs" role="group" aria-label="Rubriques">
             {CATEGORIES.map((c) => (
@@ -117,18 +117,14 @@ export function PhotoManager({ products, gallery }: { products: Product[]; galle
                 ? p.image_source === "restaurant"
                   ? "Vraie photo"
                   : "Photo d'illustration"
-                : isPizza(p)
-                  ? "Illustration dessinée"
-                  : "Pas d'image";
+                : "Pas de photo";
               return (
                 <article className="item adm-card" key={p.id}>
                   <div className="item-photo">
                     {p.image_path ? (
                       <AdminThumb path={p.image_path} alt={p.image_alt || defaultProductAlt(p)} />
-                    ) : isPizza(p) ? (
-                      <PizzaIllustration name={p.name} description={p.description} category={p.category} />
                     ) : (
-                      <div className="ph-missing">Pas d&apos;image</div>
+                      <PhotoPlaceholder />
                     )}
                     <span className="ph-badge">{status}</span>
                   </div>

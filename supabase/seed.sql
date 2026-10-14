@@ -93,6 +93,20 @@ from (values
 ) as v(name, image_path, alt)
 where p.name = v.name and p.image_path is null;
 
+-- Photos d'illustration générées par IA pour les pizzas sans vraie photo
+update public.products p
+set image_path = v.image_path, image_alt = v.alt, image_source = 'illustration', image_updated_at = now()
+from (values
+  ('La Margherita', '/photos/pizzas-ia/margherita.webp', 'Pizza Margherita : sauce tomate, mozzarella fondue, origan'),
+  ('La Milano',     '/photos/pizzas-ia/milano.webp',     'Pizza Milano : mozzarella, poulet, viande hachée, merguez et œufs'),
+  ('La Reine',      '/photos/pizzas-ia/reine.webp',      'Pizza Reine : mozzarella, champignons et jambon sur sauce tomate'),
+  ('La Boursalino', '/photos/pizzas-ia/boursalino.webp', 'Pizza Boursalino : mozzarella, Boursin, viande hachée et oignons'),
+  ('La 4 Saisons',  '/photos/pizzas-ia/4-saisons.webp',  'Pizza 4 Saisons : champignons, poivrons, olives noires et jambon'),
+  ('La Mexicaine',  '/photos/pizzas-ia/mexicaine.webp',  'Pizza Mexicaine : merguez, viande hachée et oignons sur sauce tomate'),
+  ('La Chicken',    '/photos/pizzas-ia/chicken.webp',    'Pizza Chicken : poulet, champignons et œufs sur sauce tomate')
+) as v(name, image_path, alt)
+where p.name = v.name and p.image_path is null;
+
 -- ---------------------------------------------------------------------
 -- Galerie « Découvrez notre pizzeria » : photos AUTHENTIQUES prises dans
 -- le restaurant (fichiers dans public/photos/etablissement, métadonnées
@@ -106,10 +120,7 @@ from (values
    'Le chef en néon qui vous accueille', 10),
   ('interieur', '/photos/etablissement/salle-comptoir.webp',
    'La salle de la pizzeria : mur en lattes de bois, enseigne néon, frigo à boissons et comptoir de commande',
-   'La salle et le comptoir de retrait', 20),
-  ('interieur', '/photos/etablissement/frigo-boissons.webp',
-   'Frigo vitré rempli de canettes de sodas et de thés glacés, à côté du mur en lattes de bois',
-   'Les boissons fraîches', 30)
+   'La salle et le comptoir de retrait', 20)
 ) as v(section, image_path, alt, caption, sort_order)
 where not exists (select 1 from public.gallery_photos g where g.image_path = v.image_path);
 

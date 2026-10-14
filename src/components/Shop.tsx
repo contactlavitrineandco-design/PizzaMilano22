@@ -9,6 +9,7 @@ import { CATEGORIES, MEATS } from "@/lib/menu";
 import type { OrderingWindow } from "@/lib/time";
 import type { CartLine, Category, Product, Supplement } from "@/lib/types";
 import { setCart, useCart } from "./cart-store";
+import { saveMyOrder, useMyOrder } from "./my-order";
 import { Lightbox, type LightboxPhoto } from "./Lightbox";
 import { ProductImage } from "./ProductImage";
 
@@ -42,6 +43,7 @@ export function Shop({ products, supplements, ordering, mode, children }: Props)
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [pending, startTransition] = useTransition();
   const [photo, setPhoto] = useState<LightboxPhoto | null>(null);
+  const myOrder = useMyOrder();
 
   const productById = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
   const supplementById = useMemo(() => new Map(supplements.map((s) => [s.id, s])), [supplements]);
@@ -112,6 +114,7 @@ export function Shop({ products, supplements, ordering, mode, children }: Props)
         setNote("");
         setCartOpen(false);
         setConfirmation(res.order);
+        if (res.order.token) saveMyOrder({ token: res.order.token, number: res.order.number, pickup: res.order.pickup });
         router.refresh();
         return;
       }
@@ -128,6 +131,14 @@ export function Shop({ products, supplements, ordering, mode, children }: Props)
     <>
       <div className="wrap shop">
         <div className="shop-main">
+          {myOrder && (
+            <Link className="my-order" href={`/commande/${myOrder.token}`}>
+              <span>
+                Votre commande <b>#{myOrder.number}</b> · retrait à {myOrder.pickup}
+              </span>
+              <span className="my-order-go">Suivre ou annuler →</span>
+            </Link>
+          )}
           <section aria-label="Carte" id="carte">
             <div className="tabs" role="group" aria-label="Rubriques de la carte">
               {CATEGORIES.map((c) => (
@@ -394,6 +405,14 @@ export function Shop({ products, supplements, ordering, mode, children }: Props)
               Total à régler : <b>{eur(confirmation.total)}</b>
             </p>
             <p style={{ fontSize: 13 }}>Présentez ce numéro au comptoir. Paiement sur place.</p>
+            {confirmation.token && (
+              <p style={{ fontSize: 13 }}>
+                Un empêchement ?{" "}
+                <Link href={`/commande/${confirmation.token}`} style={{ color: "#2a1d10", fontWeight: 700 }}>
+                  Suivre ou annuler ma commande
+                </Link>
+              </p>
+            )}
             <button type="button" onClick={() => setConfirmation(null)}>
               Retour à la carte
             </button>

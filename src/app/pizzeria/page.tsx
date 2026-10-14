@@ -25,6 +25,7 @@ function toOrder(r: Row): Order {
     payment_status: r.payment_status as Order["payment_status"],
     total: Number(r.total),
     created_at: String(r.created_at),
+    cancelled_by: (r.cancelled_by as Order["cancelled_by"]) ?? null,
     items: items.map(
       (i): OrderItem => ({
         id: String(i.id),
@@ -54,7 +55,7 @@ export default async function PizzeriaPage() {
     supabase
       .from("orders")
       .select(
-        "id, order_number, customer_name, customer_phone, pickup_time, note, status, payment_status, total, created_at, order_items(id, product_id, product_name, quantity, unit_price, supplement_name, supplement_price, meat, line_total, created_at, products(category))",
+        "id, order_number, customer_name, customer_phone, pickup_time, note, status, payment_status, total, created_at, cancelled_by, order_items(id, product_id, product_name, quantity, unit_price, supplement_name, supplement_price, meat, line_total, created_at, products(category))",
       )
       .eq("order_date", today)
       .order("pickup_time")

@@ -85,15 +85,36 @@ export function Board({ orders, products, supplements, settings, serverNow, isAd
     });
   }
 
+  // Prévenir le pizzaïolo quand un client annule (détecté à chaque rafraîchissement)
+  const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
+  const seenCancelled = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    const ids = new Set(orders.filter((o) => o.status === "cancelled").map((o) => o.id));
+    if (seenCancelled.current) {
+      const fresh = orders.filter((o) => ids.has(o.id) && !seenCancelled.current!.has(o.id) && o.cancelled_by === "client");
+      if (fresh.length) {
+        const msg = `Commande ${fresh.map((o) => `#${o.order_number}`).join(", ")} annulée par le client`;
+        setTimeout(() => {
+          setToast(msg);
+          if (toastTimer.current) clearTimeout(toastTimer.current);
+          toastTimer.current = setTimeout(() => setToast(null), 6000);
+        }, 0);
+      }
+    }
+    seenCancelled.current = ids;
+  }, [orders]);
+
   function move(order: Order, status: OrderStatus | null) {
     if (!status) return;
     const label = status === "done" ? DONE_LABEL : (STATUS_FLOW.find((s) => s.id === status)?.name.toLowerCase() ?? status);
     run(order.id, () => setOrderStatus(order.id, status), `#${order.order_number} → ${label}`);
   }
 
-  const active = orders.filter((o) => o.status !== "done");
-  const done = orders.filter((o) => o.status === "done");
-  const totalOrdered = orders.reduce((a, o) => a + o.total, 0);
+  const cancelled = orders.filter((o) => o.status === "cancelled");
+  const valid = orders.filter((o) => o.status !== "cancelled");
+  const active = valid.filter((o) => o.status !== "done");
+  const done = valid.filter((o) => o.status === "done");
+  const totalOrdered = valid.reduce((a, o) => a + o.total, 0);
   const toCook = active
     .filter((o) => o.status === "new" || o.status === "prep")
     .reduce(
@@ -139,7 +160,7 @@ export function Board({ orders, products, supplements, settings, serverNow, isAd
         <div className="stats">
           <div className="stat">
             <span>Commandes</span>
-            <b className="num">{orders.length}</b>
+            <b className="num">{valid.length}</b>
           </div>
           <div className="stat">
             <span>Total commandé</span>
@@ -147,7 +168,7 @@ export function Board({ orders, products, supplements, settings, serverNow, isAd
           </div>
           <div className="stat">
             <span>Panier moyen</span>
-            <b className="num">{eur(orders.length ? totalOrdered / orders.length : 0)}</b>
+            <b className="num">{eur(valid.length ? totalOrdered / valid.length : 0)}</b>
           </div>
           <div className="stat">
             <span>Pizzas à faire</span>
@@ -210,6 +231,29 @@ export function Board({ orders, products, supplements, settings, serverNow, isAd
                           <span className="price">{eur(o.total)}</span>
                         </div>
                         <div className="tk-actions">
+                          {st.id === "new" &&
+                            (confirmCancel === o.id ? (
+                              <button
+                                type="button"
+                                className="back tk-cancel"
+                                disabled={busy === o.id}
+                                onClick={() => {
+                                  setConfirmCancel(null);
+                                  run(o.id, () => setOrderStatus(o.id, "cancelled"), `#${o.order_number} annulée`);
+                                }}
+                              >
+                                Confirmer
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                className="back"
+                                aria-label={`Annuler la commande ${o.order_number}`}
+                                onClick={() => setConfirmCancel(o.id)}
+                              >
+                                ✕
+                              </button>
+                            ))}
                           {si > 0 && (
                             <button
                               type="button"
@@ -241,6 +285,14 @@ export function Board({ orders, products, supplements, settings, serverNow, isAd
         <div className="done-list">
           {done.length > 0 && `Récupérées aujourd'hui : ${done.map((o) => `#${o.order_number}`).join(", ")}`}
         </div>
+        {cancelled.length > 0 && (
+          <div className="done-list">
+            Annulées aujourd&apos;hui :{" "}
+            {cancelled
+              .map((o) => `#${o.order_number} (${o.cancelled_by === "client" ? "par le client" : "par le restaurant"})`)
+              .join(", ")}
+          </div>
+        )}
         {settings.opening_hours_provisional && (
           <div className="done-list">
             Horaires d&apos;ouverture provisoires : à confirmer avec le restaurant puis à modifier dans Supabase.

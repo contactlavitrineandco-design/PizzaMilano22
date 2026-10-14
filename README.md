@@ -10,6 +10,7 @@ Site de commande à emporter de la pizzeria Pizza Milano, avec un espace restaur
 | ------------ | --------------------------------------------------------------------- |
 | `/`          | Site public : bandeau, carte, panier                                   |
 | `/commander` | Carte + panier + formulaire de commande                                |
+| `/commande/<jeton>` | Suivi de sa commande par le client, annulation tant qu'elle n'est pas lancée |
 | `/login`     | Connexion du personnel                                                 |
 | `/pizzeria`  | Tableau des commandes, statistiques, ruptures, ouverture des commandes |
 | `/pizzeria/photos` | Photos de la carte et galerie de la pizzeria (compte admin uniquement) |
@@ -31,7 +32,7 @@ npm install
 **Option A : projet Supabase en ligne (le plus simple)**
 
 1. Créez un projet sur supabase.com (région Europe, par exemple Paris ou Francfort).
-2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (`…_init.sql`, `…_photos.sql`, qui crée aussi le stockage des photos, `…_seo.sql`, `…_photos_hd.sql`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
+2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (dans l'ordre des noms : `…_init`, `…_photos` qui crée aussi le stockage des photos, `…_seo`, `…_photos_hd`, `…_photos_ia`, `…_annulation`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
    Avec la CLI, c'est équivalent à : `npx supabase link --project-ref <ref>` puis `npm run db:push`, et le seed dans le SQL Editor.
 3. Dans **Authentication > Sign In / Providers**, **désactivez les inscriptions** (« Allow new users to sign up »). Seuls les comptes que vous créez vous-même doivent exister.
 
@@ -145,6 +146,14 @@ public/photos/etablissement/  vraies photos de la salle (sans métadonnées GPS)
 5. Le client reçoit uniquement son numéro, le total, l'heure de retrait et son prénom.
 6. La tablette reçoit la commande en temps réel (Supabase Realtime, filtré par les policies).
 
+### Annulation par le client
+
+- À la création, chaque commande reçoit un **jeton secret** (`orders.cancel_token`), renvoyé seulement au client qui l'a passée.
+- L'écran de confirmation affiche le lien « Suivre ou annuler ma commande » (`/commande/<jeton>`). Le navigateur mémorise aussi la commande du jour : un bandeau « Votre commande #N » reste en haut de la carte.
+- La page de suivi montre l'avancement (Reçue → Au four → Prête → Récupérée) et se met à jour toute seule toutes les 30 s.
+- **Annulation possible tant que la commande est « Nouvelle »**. Dès que le pizzaïolo l'a lancée, le client doit appeler. La règle est vérifiée en base par `cancel_order_by_token()`.
+- Côté tablette : une annulation client fait disparaître le ticket, affiche « Commande #N annulée par le client » et apparaît dans « Annulées aujourd'hui ». Les commandes annulées sont exclues des statistiques. Le pizzaïolo peut aussi annuler une nouvelle commande (bouton ✕, avec confirmation), et une commande annulée ne peut plus être relancée.
+
 ### Numéro de commande du jour
 
 La table `order_counters` contient une ligne par jour (heure de Paris). `create_order()` l'incrémente avec `insert … on conflict do update`. Cela verrouille la ligne jusqu'à la fin de la transaction, donc deux commandes simultanées ne peuvent pas obtenir le même numéro. Si la commande échoue, l'incrément est annulé, donc il n'y a pas de trou. Une contrainte `unique (order_date, order_number)` sert de filet de sécurité.
@@ -221,7 +230,9 @@ Pour modifier les horaires, ouvrez **Table Editor > restaurant_settings** et éd
 
 - Les 5 vraies photos (Raclette, Saumon, Chorizo, Neptune, Cannibale) ont été agrandies par super-résolution (modèle EDSR ×4, 1200 × 900) : fichiers `*-hd.webp`. La migration `…_photos_hd.sql` bascule la base sur ces fichiers. Le gain est réel mais limité, parce que les originaux Uber Eats ne font qu'environ 300 px.
 - 4 photos d'illustration réalistes ont été générées avec Canva IA, dans le style des vraies photos : Margherita, Milano, Reine, Boursalino. Elles sont dans le compte Canva, pas dans le projet, car le téléchargement depuis Canva n'était pas possible depuis l'environnement de développement. Pour les mettre en ligne : les ouvrir dans Canva, les télécharger en JPG, puis `/pizzeria/photos` > la pizza > « Ajouter une photo », origine **« Image d'illustration »**. Elles s'afficheront avec la mention « Photo d'illustration ».
-- Les crédits IA du compte Canva ont été épuisés après ces 4 images. Les 10 autres pizzas gardent l'illustration dessinée jusqu'à de nouvelles photos.
+- Mise à jour : 7 photos IA sont maintenant **intégrées au site** (`public/photos/pizzas-ia/`, agrandies par super-résolution) : Margherita, Milano, Reine, Boursalino, 4 Saisons, Mexicaine, Chicken. Elles portent la mention « Photo d'illustration ».
+- Il reste 7 pizzas sans photo (4 Fromages, Végétarienne, Paysanne, 5 Fromages, Chèvre Miel, Tartiflette, Burrata). Elles affichent un emplacement neutre : les illustrations dessinées ont été retirées pour un rendu plus propre. Crédits Canva épuisés à nouveau.
+- La photo du frigo a été retirée de la galerie.
 
 **Obtenir des images pour les pizzas sans photo**
 
