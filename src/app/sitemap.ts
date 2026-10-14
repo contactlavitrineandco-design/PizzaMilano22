@@ -1,7 +1,12 @@
 import type { MetadataRoute } from "next";
 import { siteUrl } from "@/lib/site";
 
-// Seule la page d'accueil est indexable (/commander, /login et /pizzeria sont en noindex).
+// Pages indexables (/commander, /commande, /login et /pizzeria sont en noindex).
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [{ url: `${siteUrl()}/`, changeFrequency: "weekly", priority: 1 }];
+  const base = siteUrl();
+  return [
+    { url: `${base}/`, changeFrequency: "weekly", priority: 1 },
+    { url: `${base}/mentions-legales`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${base}/confidentialite`, changeFrequency: "yearly", priority: 0.2 },
+  ];
 }

@@ -51,6 +51,7 @@ export function toSettings(r: Record<string, unknown>): RestaurantSettings {
     postal_code: (r.postal_code as string | null) ?? null,
     city: (r.city as string | null) ?? null,
     google_maps_url: (r.google_maps_url as string | null) ?? null,
+    instagram_url: (r.instagram_url as string | null) ?? null,
     latitude: r.latitude == null ? null : Number(r.latitude),
     longitude: r.longitude == null ? null : Number(r.longitude),
     phone: (r.phone as string | null) ?? null,
@@ -101,4 +102,12 @@ export async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
     return [];
   }
   return (data ?? []).map(toGalleryPhoto);
+}
+
+/** Réglages publics du restaurant (coordonnées, horaires). */
+export async function getSettings(): Promise<RestaurantSettings> {
+  const db = createPublicClient();
+  const { data, error } = await db.from("restaurant_settings").select("*").eq("id", 1).single();
+  if (error) throw new Error(`Lecture des réglages impossible : ${error.message}`);
+  return toSettings(data);
 }

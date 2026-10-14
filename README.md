@@ -10,6 +10,8 @@ Site de commande à emporter de la pizzeria Pizza Milano, avec un espace restaur
 | ------------ | --------------------------------------------------------------------- |
 | `/`          | Site public : bandeau, carte, panier                                   |
 | `/commander` | Carte + panier + formulaire de commande                                |
+| `/mentions-legales` | Mentions légales + conditions de commande |
+| `/confidentialite` | Politique de confidentialité (RGPD) |
 | `/commande/<jeton>` | Suivi de sa commande par le client, annulation tant qu'elle n'est pas lancée |
 | `/login`     | Connexion du personnel                                                 |
 | `/pizzeria`  | Tableau des commandes, statistiques, ruptures, ouverture des commandes |
@@ -32,7 +34,7 @@ npm install
 **Option A : projet Supabase en ligne (le plus simple)**
 
 1. Créez un projet sur supabase.com (région Europe, par exemple Paris ou Francfort).
-2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (dans l'ordre des noms : `…_init`, `…_photos` qui crée aussi le stockage des photos, `…_seo`, `…_photos_hd`, `…_photos_ia`, `…_annulation`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
+2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (dans l'ordre des noms : `…_init`, `…_photos` qui crée aussi le stockage des photos, `…_seo`, `…_photos_hd`, `…_photos_ia`, `…_annulation`, `…_photos_nettes_legal`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
    Avec la CLI, c'est équivalent à : `npx supabase link --project-ref <ref>` puis `npm run db:push`, et le seed dans le SQL Editor.
 3. Dans **Authentication > Sign In / Providers**, **désactivez les inscriptions** (« Allow new users to sign up »). Seuls les comptes que vous créez vous-même doivent exister.
 
@@ -272,6 +274,32 @@ where id = 1;
 
 ---
 
+## Légal et sécurité
+
+**Pages** : `/mentions-legales` (éditeur, hébergeur, propriété intellectuelle, conditions de commande) et `/confidentialite` (RGPD). Elles sont liées en bas de chaque page et sous le formulaire de commande.
+
+**À remplir dans `src/lib/legal.ts`** (tant que c'est vide, les pages affichent « [à compléter : …] » en orange) :
+
+| Champ | Où le trouver |
+| --- | --- |
+| Raison sociale, forme juridique, capital | Extrait Kbis ou avis de situation INSEE |
+| SIRET, immatriculation (RCS ou RM) | Kbis / [annuaire-entreprises.data.gouv.fr](https://annuaire-entreprises.data.gouv.fr) |
+| TVA intracommunautaire | Kbis ou espace professionnel impots.gouv (si assujetti) |
+| Directeur de la publication | En général le gérant |
+| E-mail de contact | Adresse que le restaurant consulte (sert aussi aux demandes RGPD) |
+| Médiateur de la consommation | **Obligatoire** pour vendre à des particuliers (art. L612-1 Code conso). Adhésion à un médiateur agréé, liste sur [economie.gouv.fr/mediation-conso](https://www.economie.gouv.fr/mediation-conso) |
+| Région Supabase | Supabase > Project Settings > General (choisir une région de l'UE à la création) |
+
+**Base de données** (Supabase > SQL Editor) : adresse, téléphone, horaires réels (`opening_hours_provisional = false`), lien Google Maps et lien Instagram (`instagram_url`). Voir la section Référencement.
+
+**Sécurité en place** : HTTPS forcé (HSTS), en-têtes de protection (pas d'intégration dans une autre page, pas d'accès caméra/micro/position), accès aux commandes réservé au personnel (RLS), prix recalculés côté serveur, jeton secret pour l'annulation, limite anti-abus, clé secrète jamais envoyée au navigateur.
+
+**RGPD** : les commandes de plus de 12 mois sont supprimées chaque nuit par `purge_old_orders()` (planifiée avec pg_cron par la migration `…_photos_nettes_legal`). Vérifier dans Supabase > Database > Extensions que **pg_cron** est activé ; sinon l'activer et relancer le bloc final de cette migration.
+
+**À faire relire** : ces textes sont un modèle sérieux, pas un avis juridique. Faites-les relire si possible (CCI des Côtes-d'Armor, expert-comptable).
+
+---
+
 ## À confirmer avec le restaurant
 
 Ces données sont en base mais **ne sont pas validées commercialement**. Les produits concernés ont `to_confirm = true` dans la table `products`.
@@ -281,6 +309,8 @@ Ces données sont en base mais **ne sont pas validées commercialement**. Les pr
 - [ ] Délai minimum de préparation (20 min) et pas des créneaux (10 min).
 
 **Coordonnées (indispensables au référencement local)**
+- [ ] Adresse trouvée sur Mappy pour « Milano Pizza » : **3 rue du Maréchal Foch, 22000 Saint-Brieuc**. À confirmer avant de l'enregistrer (le nom diffère légèrement, et les horaires Mappy semblent incohérents).
+- [ ] Nom exact du compte Instagram (« pizza milano 22 »), pour `instagram_url`.
 - [ ] Adresse et téléphone du restaurant (vides dans `restaurant_settings`).
 - [ ] Nom du restaurant : « Pizza Milano ». La plaque du comptoir indique « Pizza Zone ».
 

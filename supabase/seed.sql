@@ -85,11 +85,11 @@ on conflict (name) do nothing;
 update public.products p
 set image_path = v.image_path, image_alt = v.alt, image_source = 'restaurant', image_updated_at = now()
 from (values
-  ('La Raclette',  '/photos/pizzas/raclette-hd.webp',  'Pizza Raclette sur une assiette à pois : jambon, pomme de terre, fromage à raclette fondu et oignons rouges'),
-  ('La Saumon',    '/photos/pizzas/saumon-hd.webp',    'Pizza Saumon sur base crème, larges tranches de saumon et herbes, pâte dorée'),
-  ('La Chorizo',   '/photos/pizzas/chorizo-hd.webp',   'Pizza Chorizo sur sauce tomate : rondelles de chorizo, pomme de terre et fromage fondu'),
-  ('La Neptune',   '/photos/pizzas/neptune-hd.webp',   'Pizza Neptune : thon, poivrons rouges et verts, oignons rouges et olives noires sur sauce tomate'),
-  ('La Cannibale', '/photos/pizzas/cannibale-hd.webp', 'Pizza Cannibale sur base crème : poulet, viande hachée, merguez et lamelles de jambon')
+  ('La Raclette',  '/photos/carte/raclette.webp',  'Pizza Raclette sur une assiette à pois : jambon, pomme de terre, fromage à raclette fondu et oignons rouges'),
+  ('La Saumon',    '/photos/carte/saumon.webp',    'Pizza Saumon sur base crème, larges tranches de saumon et herbes, pâte dorée'),
+  ('La Chorizo',   '/photos/carte/chorizo.webp',   'Pizza Chorizo sur sauce tomate : rondelles de chorizo, pomme de terre et fromage fondu'),
+  ('La Neptune',   '/photos/carte/neptune.webp',   'Pizza Neptune : thon, poivrons rouges et verts, oignons rouges et olives noires sur sauce tomate'),
+  ('La Cannibale', '/photos/carte/cannibale.webp', 'Pizza Cannibale sur base crème : poulet, viande hachée, merguez et lamelles de jambon')
 ) as v(name, image_path, alt)
 where p.name = v.name and p.image_path is null;
 
@@ -97,13 +97,13 @@ where p.name = v.name and p.image_path is null;
 update public.products p
 set image_path = v.image_path, image_alt = v.alt, image_source = 'illustration', image_updated_at = now()
 from (values
-  ('La Margherita', '/photos/pizzas-ia/margherita.webp', 'Pizza Margherita : sauce tomate, mozzarella fondue, origan'),
-  ('La Milano',     '/photos/pizzas-ia/milano.webp',     'Pizza Milano : mozzarella, poulet, viande hachée, merguez et œufs'),
-  ('La Reine',      '/photos/pizzas-ia/reine.webp',      'Pizza Reine : mozzarella, champignons et jambon sur sauce tomate'),
-  ('La Boursalino', '/photos/pizzas-ia/boursalino.webp', 'Pizza Boursalino : mozzarella, Boursin, viande hachée et oignons'),
-  ('La 4 Saisons',  '/photos/pizzas-ia/4-saisons.webp',  'Pizza 4 Saisons : champignons, poivrons, olives noires et jambon'),
-  ('La Mexicaine',  '/photos/pizzas-ia/mexicaine.webp',  'Pizza Mexicaine : merguez, viande hachée et oignons sur sauce tomate'),
-  ('La Chicken',    '/photos/pizzas-ia/chicken.webp',    'Pizza Chicken : poulet, champignons et œufs sur sauce tomate')
+  ('La Margherita', '/photos/carte/margherita.webp', 'Pizza Margherita : sauce tomate, mozzarella fondue, origan'),
+  ('La Milano',     '/photos/carte/milano.webp',     'Pizza Milano : mozzarella, poulet, viande hachée, merguez et œufs'),
+  ('La Reine',      '/photos/carte/reine.webp',      'Pizza Reine : mozzarella, champignons et jambon sur sauce tomate'),
+  ('La Boursalino', '/photos/carte/boursalino.webp', 'Pizza Boursalino : mozzarella, Boursin, viande hachée et oignons'),
+  ('La 4 Saisons',  '/photos/carte/4-saisons.webp',  'Pizza 4 Saisons : champignons, poivrons, olives noires et jambon'),
+  ('La Mexicaine',  '/photos/carte/mexicaine.webp',  'Pizza Mexicaine : merguez, viande hachée et oignons sur sauce tomate'),
+  ('La Chicken',    '/photos/carte/chicken.webp',    'Pizza Chicken : poulet, champignons et œufs sur sauce tomate')
 ) as v(name, image_path, alt)
 where p.name = v.name and p.image_path is null;
 
@@ -117,10 +117,7 @@ select v.section, v.image_path, v.alt, v.caption, 'restaurant', v.sort_order
 from (values
   ('interieur', '/photos/etablissement/neon-chef.webp',
    'Enseigne néon blanche d''un chef pizzaïolo tenant une pizza, sur le mur en lattes de bois éclairé',
-   'Le chef en néon qui vous accueille', 10),
-  ('interieur', '/photos/etablissement/salle-comptoir.webp',
-   'La salle de la pizzeria : mur en lattes de bois, enseigne néon, frigo à boissons et comptoir de commande',
-   'La salle et le comptoir de retrait', 20)
+   'Le chef en néon qui vous accueille', 10)
 ) as v(section, image_path, alt, caption, sort_order)
 where not exists (select 1 from public.gallery_photos g where g.image_path = v.image_path);
 

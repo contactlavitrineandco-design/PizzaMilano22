@@ -48,7 +48,7 @@ export function PracticalInfo({
           )}
         </div>
 
-        {(hasAddress || settings.phone) && (
+        {(hasAddress || settings.phone || settings.instagram_url) && (
           <div>
             <h3>Nous trouver</h3>
             <address className="foot-address">
@@ -71,6 +71,11 @@ export function PracticalInfo({
             {settings.google_maps_url && (
               <a className="foot-link" href={settings.google_maps_url} target="_blank" rel="noopener">
                 Itinéraire sur Google Maps
+              </a>
+            )}
+            {settings.instagram_url && (
+              <a className="foot-link" href={settings.instagram_url} target="_blank" rel="noopener">
+                Instagram
               </a>
             )}
           </div>
@@ -96,6 +101,12 @@ export function PracticalInfo({
             </table>
           </div>
         )}
+      </div>
+      <div className="wrap foot-legal">
+        <span>© {settings.restaurant_name}</span>
+        <Link href="/mentions-legales">Mentions légales</Link>
+        <Link href="/mentions-legales#conditions">Conditions de commande</Link>
+        <Link href="/confidentialite">Confidentialité</Link>
       </div>
     </footer>
   );

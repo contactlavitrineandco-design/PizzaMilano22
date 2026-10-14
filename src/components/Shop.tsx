@@ -376,6 +376,11 @@ export function Shop({ products, supplements, ordering, mode, children }: Props)
                   {error}
                 </div>
               )}
+              <p className="form-legal">
+                Vos informations servent uniquement à préparer votre commande.{" "}
+                <Link href="/confidentialite">Confidentialité</Link> ·{" "}
+                <Link href="/mentions-legales#conditions">Conditions</Link>
+              </p>
               <button className="cta" type="submit" disabled={!canSubmit}>
                 {pending ? "Envoi en cours…" : ordering.canOrder ? "Envoyer la commande" : "Commandes fermées"}
               </button>
