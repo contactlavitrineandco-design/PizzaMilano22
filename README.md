@@ -118,7 +118,7 @@ src/
     pizzeria/photos/         gestion des photos (admin) : page, actions serveur, PhotoManager
     globals.css              CSS de la maquette, inchangé
   components/                Header, Hero, NeonChef, Shop, cart-store,
-                             ProductImage, PizzaIllustration, PizzeriaGallery, Lightbox
+                             ProductImage, PhotoPlaceholder, PizzeriaGallery, Lightbox, my-order
   lib/
     orders/validation.ts     validation serveur (prénom, téléphone, panier, heure)
     orders/create.ts         création de commande + point d'extension paiement
@@ -203,7 +203,7 @@ Pour modifier les horaires, ouvrez **Table Editor > restaurant_settings** et éd
 - Chaque carte de la carte affiche une grande photo (format 4:3). Un clic l'agrandit. Les rubriques (base tomate, base crème, soufflés, boissons) servent de filtres.
 - Ordre de priorité pour chaque produit :
   1. la photo enregistrée dans l'espace photos ;
-  2. pour une pizza sans photo, une **illustration dessinée d'après ses ingrédients réels** (olives, champignons, jambon, œuf…). Elle porte toujours la mention « Illustration ». Ce n'est pas une photo et elle ne prétend pas en être une ;
+  2. pour une pizza sans photo, un emplacement neutre (lattes de bois et pictogramme), sans fausse image ;
   3. pour un autre produit sans photo, la carte reste en texte. Si d'autres produits de la même rubrique ont une photo, un panneau neutre garde les cartes alignées.
 - Si une photo ne se charge pas, la carte bascule automatiquement sur l'illustration ou le panneau neutre.
 - Une image ajoutée comme « Image d'illustration » (banque d'images, IA…) porte la mention « Photo d'illustration », sur la carte comme dans la galerie.
@@ -215,7 +215,7 @@ Pour modifier les horaires, ouvrez **Table Editor > restaurant_settings** et éd
 1. Choisissez le produit (ou « Ajouter une photo » pour la galerie).
 2. Choisissez une photo sur l'ordinateur, la tablette ou le téléphone. L'aperçu montre le cadrage exact sur la carte, rien n'est encore publié.
 3. Indiquez l'origine (« Photo prise chez Pizza Milano » ou « Image d'illustration ») et vérifiez la description (proposée automatiquement à partir des ingrédients).
-4. « Publier ». Remplacer une photo supprime l'ancienne du stockage. « Supprimer » remet l'illustration dessinée.
+4. « Publier ». Remplacer une photo supprime l'ancienne du stockage. « Supprimer » remet l'emplacement neutre.
 5. Dans la galerie, vous pouvez aussi masquer une photo, changer sa rubrique, sa légende et son ordre.
 
 **Côté technique**
