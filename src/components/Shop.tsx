@@ -128,7 +128,7 @@ export function Shop({ products, supplements, ordering, mode, children }: Props)
     <>
       <div className="wrap shop">
         <div className="shop-main">
-          <section aria-label="Carte">
+          <section aria-label="Carte" id="carte">
             <div className="tabs" role="group" aria-label="Rubriques de la carte">
               {CATEGORIES.map((c) => (
                 <button key={c.id} type="button" aria-pressed={c.id === cat} onClick={() => setCat(c.id)}>

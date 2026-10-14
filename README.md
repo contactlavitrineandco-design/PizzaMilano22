@@ -31,7 +31,7 @@ npm install
 **Option A : projet Supabase en ligne (le plus simple)**
 
 1. Créez un projet sur supabase.com (région Europe, par exemple Paris ou Francfort).
-2. Dans **SQL Editor**, exécutez dans l'ordre les trois fichiers de `supabase/migrations/` (`…_init.sql`, `…_photos.sql`, qui crée aussi le stockage des photos, puis `…_seo.sql`), puis `supabase/seed.sql`.
+2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (`…_init.sql`, `…_photos.sql`, qui crée aussi le stockage des photos, `…_seo.sql`, `…_photos_hd.sql`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
    Avec la CLI, c'est équivalent à : `npx supabase link --project-ref <ref>` puis `npm run db:push`, et le seed dans le SQL Editor.
 3. Dans **Authentication > Sign In / Providers**, **désactivez les inscriptions** (« Allow new users to sign up »). Seuls les comptes que vous créez vous-même doivent exister.
 
@@ -216,6 +216,12 @@ Pour modifier les horaires, ouvrez **Table Editor > restaurant_settings** et éd
 - Après l'envoi, le serveur relit le fichier stocké (taille, signature binaire). Il supprime le fichier s'il n'est pas une vraie image, puis enregistre le lien en base.
 - La base n'accepte que deux formes de chemin : un fichier du site (`/photos/…`) ou un fichier du bucket (`products/<uuid>.webp`, `gallery/<uuid>.webp`). Une URL externe est refusée, ce qui exclut les liens cassés et les images de sites tiers.
 - Chaque nouveau fichier a un nom unique : le cache des images peut durer 31 jours sans risque d'afficher une ancienne version.
+
+**Photos améliorées et images générées (14/10/2026)**
+
+- Les 5 vraies photos (Raclette, Saumon, Chorizo, Neptune, Cannibale) ont été agrandies par super-résolution (modèle EDSR ×4, 1200 × 900) : fichiers `*-hd.webp`. La migration `…_photos_hd.sql` bascule la base sur ces fichiers. Le gain est réel mais limité, parce que les originaux Uber Eats ne font qu'environ 300 px.
+- 4 photos d'illustration réalistes ont été générées avec Canva IA, dans le style des vraies photos : Margherita, Milano, Reine, Boursalino. Elles sont dans le compte Canva, pas dans le projet, car le téléchargement depuis Canva n'était pas possible depuis l'environnement de développement. Pour les mettre en ligne : les ouvrir dans Canva, les télécharger en JPG, puis `/pizzeria/photos` > la pizza > « Ajouter une photo », origine **« Image d'illustration »**. Elles s'afficheront avec la mention « Photo d'illustration ».
+- Les crédits IA du compte Canva ont été épuisés après ces 4 images. Les 10 autres pizzas gardent l'illustration dessinée jusqu'à de nouvelles photos.
 
 **Obtenir des images pour les pizzas sans photo**
 

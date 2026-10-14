@@ -18,10 +18,21 @@ export default async function CommanderPage() {
   return (
     <>
       <main>
-        <Hero banner={data.banner} prices={data.prices} city={data.city} />
+        <Hero
+          banner={data.banner}
+          prices={data.prices}
+          city={data.city}
+          cta={{ href: "#carte", label: "Choisir mes pizzas" }}
+          showMenuLink={false}
+        />
         <Shop products={data.products} supplements={data.supplements} ordering={data.ordering} mode="order" />
       </main>
-      <PracticalInfo settings={data.settings} city={data.city} pizzaFrom={data.prices.pizzaFrom} showOrderLink={false} />
+      <PracticalInfo
+        settings={data.settings}
+        city={data.city}
+        pizzaFrom={data.prices.pizzaFrom}
+        showOrderLink={false}
+      />
     </>
   );
 }

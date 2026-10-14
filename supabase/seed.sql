@@ -85,11 +85,11 @@ on conflict (name) do nothing;
 update public.products p
 set image_path = v.image_path, image_alt = v.alt, image_source = 'restaurant', image_updated_at = now()
 from (values
-  ('La Raclette',  '/photos/pizzas/raclette.webp',  'Pizza Raclette sur une assiette à pois : jambon, pomme de terre, fromage à raclette fondu et oignons rouges'),
-  ('La Saumon',    '/photos/pizzas/saumon.webp',    'Pizza Saumon sur base crème, larges tranches de saumon et herbes, pâte dorée'),
-  ('La Chorizo',   '/photos/pizzas/chorizo.webp',   'Pizza Chorizo sur sauce tomate : rondelles de chorizo, pomme de terre et fromage fondu'),
-  ('La Neptune',   '/photos/pizzas/neptune.webp',   'Pizza Neptune : thon, poivrons rouges et verts, oignons rouges et olives noires sur sauce tomate'),
-  ('La Cannibale', '/photos/pizzas/cannibale.webp', 'Pizza Cannibale sur base crème : poulet, viande hachée, merguez et lamelles de jambon')
+  ('La Raclette',  '/photos/pizzas/raclette-hd.webp',  'Pizza Raclette sur une assiette à pois : jambon, pomme de terre, fromage à raclette fondu et oignons rouges'),
+  ('La Saumon',    '/photos/pizzas/saumon-hd.webp',    'Pizza Saumon sur base crème, larges tranches de saumon et herbes, pâte dorée'),
+  ('La Chorizo',   '/photos/pizzas/chorizo-hd.webp',   'Pizza Chorizo sur sauce tomate : rondelles de chorizo, pomme de terre et fromage fondu'),
+  ('La Neptune',   '/photos/pizzas/neptune-hd.webp',   'Pizza Neptune : thon, poivrons rouges et verts, oignons rouges et olives noires sur sauce tomate'),
+  ('La Cannibale', '/photos/pizzas/cannibale-hd.webp', 'Pizza Cannibale sur base crème : poulet, viande hachée, merguez et lamelles de jambon')
 ) as v(name, image_path, alt)
 where p.name = v.name and p.image_path is null;
 

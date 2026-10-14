@@ -21,7 +21,17 @@ export default async function HomePage() {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdScript(restaurantJsonLd(data.settings, data.products, gallery)) }}
         />
-        <Hero banner={data.banner} prices={data.prices} city={data.city} />
+        <Hero
+          banner={data.banner}
+          prices={data.prices}
+          city={data.city}
+          cta={
+            data.ordering.canOrder
+              ? { href: "/commander#carte", label: "Commander maintenant" }
+              : { href: "#carte", label: "Voir la carte" }
+          }
+          showMenuLink={data.ordering.canOrder}
+        />
         <Shop products={data.products} supplements={data.supplements} ordering={data.ordering} mode="browse">
           <PizzeriaGallery photos={gallery} />
         </Shop>

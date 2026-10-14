@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { eur } from "@/lib/format";
 import { NeonChef } from "./NeonChef";
 
@@ -9,7 +10,20 @@ export interface HeroPrices {
 
 const euro = (v: number) => (Number.isInteger(v) ? `${v} €` : eur(v));
 
-export function Hero({ banner, prices, city }: { banner: string | null; prices: HeroPrices; city: string }) {
+export function Hero({
+  banner,
+  prices,
+  city,
+  cta,
+  showMenuLink,
+}: {
+  banner: string | null;
+  prices: HeroPrices;
+  city: string;
+  /** Bouton principal du bandeau (la commande d'abord). */
+  cta: { href: string; label: string };
+  showMenuLink: boolean;
+}) {
   return (
     <section className="hero slats">
       <div className="wrap">
@@ -23,6 +37,17 @@ export function Hero({ banner, prices, city }: { banner: string | null; prices: 
             Choisissez vos pizzas sur la carte, indiquez l&apos;heure de retrait et réglez au comptoir. Votre commande
             arrive directement sur la tablette du pizzaïolo.
           </p>
+          {/* La commande d'abord : bouton principal visible dès l'arrivée */}
+          <div className="hero-actions">
+            <Link className="cta" href={cta.href}>
+              {cta.label}
+            </Link>
+            {showMenuLink && (
+              <a className="ghost" href="#carte">
+                Voir la carte
+              </a>
+            )}
+          </div>
           <div className="chips">
             {prices.pizzaFrom !== null && (
               <span className="chip">
