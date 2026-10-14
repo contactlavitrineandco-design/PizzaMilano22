@@ -31,8 +31,8 @@ export default async function MentionsLegales() {
           </dd>
           <dt>Forme juridique</dt>
           <dd>
-            <LegalField value={e.formeJuridique} label="forme juridique" />
-            {e.capital && `, capital de ${e.capital}`}
+            <LegalField value={e.formeJuridique} label="forme juridique" />, capital de{" "}
+            <LegalField value={e.capital} label="capital social" />
           </dd>
           <dt>Siège social</dt>
           <dd>
