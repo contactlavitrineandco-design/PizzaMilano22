@@ -314,11 +314,10 @@ Ces données sont en base mais **ne sont pas validées commercialement**. Les pr
 
 **Coordonnées (indispensables au référencement local)**
 - [x] Adresse et téléphone repris de la fiche Google Maps « Milano pizza » (14/10/2026) : **3 rue du Maréchal Foch, 22000 Saint-Brieuc, 06 50 64 73 89**. Enregistrés par la migration `…_coordonnees_galerie` et le seed.
-- [ ] **Nom** : la fiche Google dit « Milano pizza », le site dit « Pizza Milano ». Pour Google, il faut le même nom partout.
+- [x] **Nom affiché : « Pizza Milano »** (choisi le 15/10/2026). La raison sociale légale reste « SAS MILANO PIZZA 22 » dans les mentions légales. Penser à renommer la fiche Google « Milano pizza » en « Pizza Milano » pour avoir le même nom partout.
 - [ ] **Horaires** : ceux de la fiche Google paraissent erronés (lundi 9 h–minuit, mardi minuit–17 h…). Ils ne sont pas repris : donner les vrais horaires.
 - [ ] Nom exact du compte Instagram (« pizza milano 22 »), pour `instagram_url`.
-- [ ] Adresse et téléphone du restaurant (vides dans `restaurant_settings`).
-- [ ] Nom du restaurant : « Pizza Milano ». La plaque du comptoir indique « Pizza Zone ».
+- [x] Nom du restaurant : « Pizza Milano » (la plaque du comptoir indique « Pizza Zone »).
 
 **Produits**
 - [ ] **La Milano 13 €** : le nom est masqué sur le menu papier et vient de la caisse SumUp. Le badge « Maison » vient de la maquette, pas du restaurant.

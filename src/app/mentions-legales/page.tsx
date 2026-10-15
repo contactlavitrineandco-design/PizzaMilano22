@@ -27,7 +27,7 @@ export default async function MentionsLegales() {
         <dl className="legal-dl">
           <dt>Entreprise</dt>
           <dd>
-            <LegalField value={e.raisonSociale} label="raison sociale" /> ({s.restaurant_name})
+            <LegalField value={e.raisonSociale} label="raison sociale" />, enseigne « {s.restaurant_name} »
           </dd>
           <dt>Forme juridique</dt>
           <dd>
