@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { eur } from "@/lib/format";
+import type { OpenStatus } from "@/lib/time";
+import type { RestaurantSettings } from "@/lib/types";
 import { NeonChef } from "./NeonChef";
+import { OrderButton } from "./OrderButton";
 
 export interface HeroPrices {
   pizzaFrom: number | null;
@@ -11,19 +13,17 @@ export interface HeroPrices {
 const euro = (v: number) => (Number.isInteger(v) ? `${v} €` : eur(v));
 
 export function Hero({
-  banner,
+  settings,
   prices,
   city,
-  cta,
-  showMenuLink,
+  status,
 }: {
-  banner: string | null;
+  settings: RestaurantSettings;
   prices: HeroPrices;
   city: string;
-  /** Bouton principal du bandeau (la commande d'abord). */
-  cta: { href: string; label: string };
-  showMenuLink: boolean;
+  status: OpenStatus | null;
 }) {
+  const online = Boolean(settings.order_url);
   return (
     <section className="hero slats">
       <div className="wrap">
@@ -34,20 +34,23 @@ export function Hero({
             Commandez, on enfourne, <em>vous passez récupérer.</em>
           </p>
           <p>
-            Choisissez vos pizzas sur la carte, indiquez l&apos;heure de retrait et réglez au comptoir. Votre commande
-            arrive directement sur la tablette du pizzaïolo.
+            {online
+              ? "Choisissez vos pizzas, votre heure de retrait et réglez en ligne : votre commande arrive directement en caisse chez Pizza Milano."
+              : "Appelez-nous pour commander, on vous donne l'heure de retrait. Ou passez directement au comptoir."}
           </p>
           {/* La commande d'abord : bouton principal visible dès l'arrivée */}
           <div className="hero-actions">
-            <Link className="cta" href={cta.href}>
-              {cta.label}
-            </Link>
-            {showMenuLink && (
-              <a className="ghost" href="#carte">
-                Voir la carte
-              </a>
-            )}
+            <OrderButton settings={settings} />
+            <a className="ghost" href="#carte">
+              Voir la carte
+            </a>
           </div>
+          {status && (
+            <p className={`open-status${status.open ? " is-open" : ""}`}>
+              <span className="dot" aria-hidden="true" />
+              {status.label}
+            </p>
+          )}
           <div className="chips">
             {prices.pizzaFrom !== null && (
               <span className="chip">
@@ -64,9 +67,7 @@ export function Hero({
                 Canettes <b>{euro(prices.can)}</b>
               </span>
             )}
-            <span className="chip">Paiement CB au comptoir</span>
           </div>
-          {banner && <div className="closed-banner">{banner}</div>}
         </div>
         <NeonChef />
       </div>

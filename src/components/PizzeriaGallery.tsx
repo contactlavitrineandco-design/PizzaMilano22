@@ -55,7 +55,11 @@ export function PizzeriaGallery({ photos, settings }: { photos: GalleryPhoto[]; 
             Base tomate ou crème, de la Margherita toute simple à la Tartiflette bien fondante, en passant par la Cannibale
             pour les grosses faims, et nos soufflés servis avec leurs frites.
           </p>
-          <p>Commandez en ligne, choisissez votre heure : votre commande vous attend au comptoir, toute chaude.</p>
+          <p>
+            {settings.order_url
+              ? "Commandez en ligne, choisissez votre heure : votre commande vous attend au comptoir, toute chaude."
+              : "Un coup de fil pour commander, et votre pizza vous attend au comptoir, toute chaude."}
+          </p>
           {(fullAddress || settings.phone) && (
             <ul className="about-facts">
               {fullAddress && <li>{fullAddress}</li>}

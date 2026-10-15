@@ -1,38 +1,14 @@
-import type { Metadata } from "next";
-import { Hero } from "@/components/Hero";
-import { PracticalInfo } from "@/components/PracticalInfo";
-import { Shop } from "@/components/Shop";
-import { loadShop } from "@/lib/shop-page";
+import { redirect } from "next/navigation";
+import { getSettings } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
-// Même carte que l'accueil : on évite le contenu dupliqué en n'indexant que l'accueil.
-export const metadata: Metadata = {
-  title: "Commander",
-  description: "Choisissez vos pizzas, votre heure de retrait et envoyez votre commande à Pizza Milano.",
-  robots: { index: false, follow: true },
-};
-
+/**
+ * Adresse courte à partager (affiche, réseaux) : /commander renvoie vers la
+ * page de commande SumUp du restaurant, ou vers la carte tant qu'elle n'est
+ * pas renseignée.
+ */
 export default async function CommanderPage() {
-  const data = await loadShop();
-  return (
-    <>
-      <main>
-        <Hero
-          banner={data.banner}
-          prices={data.prices}
-          city={data.city}
-          cta={{ href: "#carte", label: "Choisir mes pizzas" }}
-          showMenuLink={false}
-        />
-        <Shop products={data.products} supplements={data.supplements} ordering={data.ordering} mode="order" />
-      </main>
-      <PracticalInfo
-        settings={data.settings}
-        city={data.city}
-        pizzaFrom={data.prices.pizzaFrom}
-        showOrderLink={false}
-      />
-    </>
-  );
+  const settings = await getSettings().catch(() => null);
+  redirect(settings?.order_url ?? "/#carte");
 }

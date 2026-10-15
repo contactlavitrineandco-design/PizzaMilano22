@@ -1,7 +1,4 @@
 export type Category = "tomate" | "creme" | "souffle" | "boisson";
-export type OrderStatus = "new" | "prep" | "ready" | "done" | "cancelled";
-export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
-export type StaffRole = "admin" | "staff";
 
 export type Weekday =
   | "monday"
@@ -70,45 +67,9 @@ export interface RestaurantSettings {
   latitude: number | null;
   longitude: number | null;
   phone: string | null;
-  online_orders_open: boolean;
+  /** Page de commande SumUp (Order & Pay). Vide : le bouton « Commander » propose d'appeler. */
+  order_url: string | null;
+  /** Une plage dont la fermeture précède l'ouverture se termine le lendemain (dimanche 18:00 → 02:00). */
   opening_hours: OpeningHours;
   opening_hours_provisional: boolean;
-  min_prep_minutes: number;
-  slot_interval_minutes: number;
-}
-
-export interface OrderItem {
-  id: string;
-  product_id: string;
-  product_name: string;
-  quantity: number;
-  unit_price: number;
-  supplement_name: string | null;
-  supplement_price: number | null;
-  meat: string | null;
-  line_total: number;
-  category: Category | null;
-}
-
-export interface Order {
-  id: string;
-  order_number: number;
-  customer_name: string;
-  customer_phone: string;
-  pickup_time: string; // ISO
-  note: string;
-  status: OrderStatus;
-  payment_status: PaymentStatus;
-  total: number;
-  created_at: string;
-  cancelled_by: "client" | "restaurant" | null;
-  items: OrderItem[];
-}
-
-/** Ligne de panier telle que stockée dans le navigateur : aucun prix. */
-export interface CartLine {
-  productId: string;
-  quantity: number;
-  supplementId: string | null;
-  meat: string | null;
 }

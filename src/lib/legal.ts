@@ -46,8 +46,6 @@ export const LEGAL = {
     /** Région choisie à la création du projet Supabase, ex. « Union européenne (Francfort) » */
     region: null as string | null,
   },
-  /** Durée de conservation du nom et du téléphone, en mois (effacement automatique ; montants gardés 10 ans, voir migration …_historique). */
-  conservationCommandesMois: 12,
   /** Date de dernière mise à jour des pages légales */
   miseAJour: "15 octobre 2026",
 };

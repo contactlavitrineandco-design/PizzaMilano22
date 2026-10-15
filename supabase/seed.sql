@@ -6,24 +6,25 @@
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
--- Réglages : HORAIRES PROVISOIRES, non communiqués par le restaurant.
--- Tous les jours 11:00-14:00 et 18:00-22:30. À remplacer avant la mise en ligne.
+-- Réglages. Horaires repris du compte Instagram @milanopizza22 (15/10/2026) :
+-- lundi fermé ; mardi au samedi 11 h – 15 h et 18 h – 23 h 30 ;
+-- dimanche 18 h – 2 h (une plage qui finit plus tôt qu'elle ne commence
+-- se termine le lendemain).
 -- ---------------------------------------------------------------------
 insert into public.restaurant_settings
-  (id, restaurant_name, address, phone, online_orders_open, opening_hours,
-   opening_hours_provisional, min_prep_minutes, slot_interval_minutes)
+  (id, restaurant_name, address, phone, opening_hours, opening_hours_provisional)
 values (
-  1, 'Pizza Milano', '3 rue du Maréchal Foch', '06 50 64 73 89', true,
+  1, 'Pizza Milano', '3 rue du Maréchal Foch', '06 50 64 73 89',
   '{
-    "monday":    [{"open": "11:00", "close": "14:00"}, {"open": "18:00", "close": "22:30"}],
-    "tuesday":   [{"open": "11:00", "close": "14:00"}, {"open": "18:00", "close": "22:30"}],
-    "wednesday": [{"open": "11:00", "close": "14:00"}, {"open": "18:00", "close": "22:30"}],
-    "thursday":  [{"open": "11:00", "close": "14:00"}, {"open": "18:00", "close": "22:30"}],
-    "friday":    [{"open": "11:00", "close": "14:00"}, {"open": "18:00", "close": "22:30"}],
-    "saturday":  [{"open": "11:00", "close": "14:00"}, {"open": "18:00", "close": "22:30"}],
-    "sunday":    [{"open": "11:00", "close": "14:00"}, {"open": "18:00", "close": "22:30"}]
+    "monday":    [],
+    "tuesday":   [{"open": "11:00", "close": "15:00"}, {"open": "18:00", "close": "23:30"}],
+    "wednesday": [{"open": "11:00", "close": "15:00"}, {"open": "18:00", "close": "23:30"}],
+    "thursday":  [{"open": "11:00", "close": "15:00"}, {"open": "18:00", "close": "23:30"}],
+    "friday":    [{"open": "11:00", "close": "15:00"}, {"open": "18:00", "close": "23:30"}],
+    "saturday":  [{"open": "11:00", "close": "15:00"}, {"open": "18:00", "close": "23:30"}],
+    "sunday":    [{"open": "18:00", "close": "02:00"}]
   }'::jsonb,
-  true, 20, 10
+  false
 )
 on conflict (id) do nothing;
 
@@ -34,8 +35,14 @@ update public.restaurant_settings set
   latitude = coalesce(latitude, 48.515201),
   longitude = coalesce(longitude, -2.761540),
   google_maps_url = coalesce(google_maps_url,
-    'https://www.google.com/maps/search/?api=1&query=Milano%20pizza&query_place_id=ChIJT6U7b0IdDkgRZO3uOmvx_Lg')
+    'https://www.google.com/maps/search/?api=1&query=Milano%20pizza&query_place_id=ChIJT6U7b0IdDkgRZO3uOmvx_Lg'),
+  instagram_url = coalesce(instagram_url, 'https://www.instagram.com/milanopizza22/')
 where id = 1;
+
+-- Lien de la page de commande SumUp (Order & Pay), à renseigner quand le
+-- restaurant l'a activée dans son compte SumUp. Tant qu'il est vide, le
+-- bouton « Commander » propose d'appeler la pizzeria.
+-- update public.restaurant_settings set order_url = 'https://…' where id = 1;
 
 -- ---------------------------------------------------------------------
 -- Suppléments (menu : « Supplément : Œufs, Fromage 0,50 €, Viande 1 € »,
@@ -132,11 +139,3 @@ select 'pizzas', '/photos/carte/neptune.webp',
        'Pizza Neptune du restaurant : thon, poivrons, oignons rouges et olives noires, devant le mur en lattes de bois',
        'Tout juste sortie du four', 'restaurant', 10
 where not exists (select 1 from public.gallery_photos where image_path = '/photos/carte/neptune.webp');
-
--- ---------------------------------------------------------------------
--- Compte administrateur : à faire une fois le compte créé dans
--- Supabase > Authentication > Users (voir README) :
---
--- insert into public.staff (user_id, role)
--- select id, 'admin' from auth.users where email = 'prenom@exemple.fr';
--- ---------------------------------------------------------------------

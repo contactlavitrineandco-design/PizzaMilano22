@@ -82,13 +82,22 @@ export function restaurantJsonLd(settings: RestaurantSettings, products: Product
     data.geo = { "@type": "GeoCoordinates", latitude: settings.latitude, longitude: settings.longitude };
   }
   if (settings.google_maps_url) data.hasMap = settings.google_maps_url;
+  if (settings.instagram_url) data.sameAs = [settings.instagram_url];
+  // Commande en ligne (page SumUp du restaurant), seulement si le lien est renseigné
+  if (settings.order_url) {
+    data.potentialAction = {
+      "@type": "OrderAction",
+      target: { "@type": "EntryPoint", urlTemplate: settings.order_url },
+      deliveryMethod: "http://purl.org/goodrelations/v1#DeliveryModePickUp",
+    };
+  }
   if (!settings.opening_hours_provisional) {
     data.openingHoursSpecification = WEEKDAYS.flatMap((d) =>
       (settings.opening_hours[d] ?? []).map((r) => ({
         "@type": "OpeningHoursSpecification",
         dayOfWeek: SCHEMA_DAYS[d],
         opens: r.open,
-        closes: r.close,
+        closes: r.close, // fermeture plus tôt que l'ouverture = le lendemain (accepté par Google)
       })),
     );
   }

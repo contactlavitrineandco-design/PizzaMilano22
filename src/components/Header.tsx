@@ -1,11 +1,8 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import type { RestaurantSettings } from "@/lib/types";
+import { OrderButton } from "./OrderButton";
 
-export function Header() {
-  const pathname = usePathname();
-  const pro = pathname.startsWith("/pizzeria") || pathname.startsWith("/login");
+export function Header({ settings }: { settings: Pick<RestaurantSettings, "order_url" | "phone"> | null }) {
   return (
     <header className="top">
       <div className="wrap">
@@ -19,13 +16,9 @@ export function Header() {
             Pizza Milano<small>Pizzeria · À emporter</small>
           </span>
         </Link>
-        <nav className="switch" aria-label="Changer d'espace">
-          <Link href="/commander" aria-current={pro ? undefined : "page"}>
-            Commander
-          </Link>
-          <Link href="/pizzeria" aria-current={pro ? "page" : undefined}>
-            Espace pizzeria
-          </Link>
+        <nav className="top-nav" aria-label="Navigation principale">
+          <Link href="/#carte">La carte</Link>
+          {settings && <OrderButton settings={settings} className="top-cta" label="Commander" />}
         </nav>
       </div>
     </header>

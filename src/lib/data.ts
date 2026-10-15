@@ -55,11 +55,9 @@ export function toSettings(r: Record<string, unknown>): RestaurantSettings {
     latitude: r.latitude == null ? null : Number(r.latitude),
     longitude: r.longitude == null ? null : Number(r.longitude),
     phone: (r.phone as string | null) ?? null,
-    online_orders_open: Boolean(r.online_orders_open),
+    order_url: typeof r.order_url === "string" && r.order_url.startsWith("https://") ? r.order_url : null,
     opening_hours: r.opening_hours as RestaurantSettings["opening_hours"],
     opening_hours_provisional: Boolean(r.opening_hours_provisional),
-    min_prep_minutes: Number(r.min_prep_minutes),
-    slot_interval_minutes: Number(r.slot_interval_minutes),
   };
 }
 
@@ -97,7 +95,7 @@ export async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
     .order("sort_order")
     .order("created_at");
   if (error) {
-    // La galerie est secondaire : une erreur ne doit pas empêcher de commander.
+    // La galerie est secondaire : une erreur ne doit pas empêcher d'afficher la carte.
     console.error("[galerie] lecture impossible", error.message);
     return [];
   }

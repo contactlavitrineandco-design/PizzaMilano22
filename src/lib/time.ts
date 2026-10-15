@@ -1,4 +1,4 @@
-import type { RestaurantSettings, TimeRange, Weekday } from "./types";
+import type { OpeningHours, TimeRange, Weekday } from "./types";
 
 /** Tous les calculs d'horaires se font en heure de Paris, quel que soit le fuseau du serveur. */
 export const TIMEZONE = "Europe/Paris";
@@ -63,73 +63,66 @@ export function fromMinutes(total: number): string {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
-/** Décalage de Paris par rapport à UTC, en minutes, à l'instant donné. */
-function parisOffsetMinutes(date: Date): number {
-  const p = parisParts(date);
-  const asUtc = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute);
-  const floored = Math.floor(date.getTime() / 60000) * 60000;
-  return Math.round((asUtc - floored) / 60000);
+export function addDaysYmd(ymd: string, n: number): string {
+  const [y, m, d] = ymd.split("-").map(Number);
+  return new Date(Date.UTC(y ?? 1970, (m ?? 1) - 1, (d ?? 1) + n)).toISOString().slice(0, 10);
 }
 
-/** Convertit une date + heure « murale » de Paris en instant UTC. */
-export function parisWallTimeToDate(ymd: string, hm: string): Date {
-  const [y, mo, d] = ymd.split("-").map(Number);
-  const [h, mi] = hm.split(":").map(Number);
-  const guess = Date.UTC(y ?? 1970, (mo ?? 1) - 1, d ?? 1, h ?? 0, mi ?? 0);
-  const first = parisOffsetMinutes(new Date(guess));
-  let ts = guess - first * 60000;
-  const second = parisOffsetMinutes(new Date(ts));
-  if (second !== first) ts = guess - second * 60000;
-  return new Date(ts);
+function weekdayOf(ymd: string): Weekday {
+  const [y, m, d] = ymd.split("-").map(Number);
+  const js = new Date(Date.UTC(y ?? 1970, (m ?? 1) - 1, d ?? 1)).getUTCDay(); // 0 = dimanche
+  return WEEKDAYS[(js + 6) % 7]!;
 }
 
-/** "HH:MM" en heure de Paris pour un instant ISO. */
-export function formatParisTime(iso: string): string {
-  const p = parisParts(new Date(iso));
-  return fromMinutes(p.hour * 60 + p.minute);
+/** Une plage dont la fermeture précède l'ouverture se termine le lendemain (ex. 18:00 → 02:00). */
+export function rangeEndMinutes(r: TimeRange): number {
+  const open = toMinutes(r.open);
+  const close = toMinutes(r.close);
+  return close <= open ? close + 1440 : close;
 }
 
-export type OrderingReason = "open" | "closed_manual" | "outside_hours" | "no_slots";
-
-export interface OrderingWindow {
-  canOrder: boolean;
-  reason: OrderingReason;
-  /** Créneaux de retrait proposables, "HH:MM", heure de Paris. */
-  slots: string[];
-  /** Date du jour à Paris, "YYYY-MM-DD". */
-  today: string;
+/** "18:00" → "18h", "23:30" → "23h30" */
+export function frHour(hm: string): string {
+  const [h, m] = hm.split(":");
+  return `${Number(h)}h${m === "00" ? "" : m}`;
 }
 
-/**
- * Règles :
- * - l'interrupteur manuel « commandes en ligne » doit être ouvert ;
- * - on ne commande que pendant une plage d'ouverture du jour ;
- * - le retrait se fait aujourd'hui, dans une plage d'ouverture
- *   (fermeture incluse), au moins min_prep_minutes après maintenant ;
- * - les créneaux sont alignés sur slot_interval_minutes.
- * La même règle est revérifiée en base par check_order_window().
- */
-export function computeOrderingWindow(settings: RestaurantSettings, now: Date = new Date()): OrderingWindow {
+const DAY_FR: Record<Weekday, string> = {
+  monday: "lundi",
+  tuesday: "mardi",
+  wednesday: "mercredi",
+  thursday: "jeudi",
+  friday: "vendredi",
+  saturday: "samedi",
+  sunday: "dimanche",
+};
+
+export interface OpenStatus {
+  open: boolean;
+  /** Phrase courte : « Ouvert jusqu'à 23h30 », « Fermé · ouvre mardi à 11h ». */
+  label: string;
+}
+
+/** Ouvert ou fermé maintenant (heure de Paris), plages de nuit comprises. */
+export function openStatus(hours: OpeningHours, now: Date = new Date()): OpenStatus {
   const p = parisParts(now);
-  const base = { today: p.ymd, slots: [] as string[] };
-
-  if (!settings.online_orders_open) return { ...base, canOrder: false, reason: "closed_manual" };
-
-  const ranges: TimeRange[] = settings.opening_hours?.[p.weekday] ?? [];
   const nowMin = p.hour * 60 + p.minute;
-  const openNow = ranges.some((r) => nowMin >= toMinutes(r.open) && nowMin < toMinutes(r.close));
-  if (!openNow) return { ...base, canOrder: false, reason: "outside_hours" };
-
-  const step = settings.slot_interval_minutes;
-  const earliest = Math.ceil((nowMin + settings.min_prep_minutes) / step) * step;
-  const slots = new Set<number>();
-  for (const r of ranges) {
-    const open = toMinutes(r.open);
-    const close = toMinutes(r.close);
-    let t = earliest > open ? earliest : Math.ceil(open / step) * step;
-    for (; t <= close; t += step) slots.add(t);
-  }
-  const list = [...slots].sort((a, b) => a - b).map(fromMinutes);
-  if (list.length === 0) return { ...base, canOrder: false, reason: "no_slots" };
-  return { ...base, canOrder: true, reason: "open", slots: list };
+  // Minutes depuis minuit aujourd'hui ; la veille en négatif, les 7 jours suivants en positif.
+  const windows = [-1, 0, 1, 2, 3, 4, 5, 6, 7].flatMap((offset) => {
+    const day = weekdayOf(addDaysYmd(p.ymd, offset));
+    return (hours[day] ?? []).map((r) => ({
+      offset,
+      day,
+      open: r.open,
+      close: r.close,
+      start: offset * 1440 + toMinutes(r.open),
+      end: offset * 1440 + rangeEndMinutes(r),
+    }));
+  });
+  const current = windows.find((w) => nowMin >= w.start && nowMin < w.end);
+  if (current) return { open: true, label: `Ouvert jusqu'à ${frHour(current.close)}` };
+  const next = windows.filter((w) => w.start > nowMin).sort((a, b) => a.start - b.start)[0];
+  if (!next) return { open: false, label: "Fermé" };
+  const when = next.offset === 0 ? "aujourd'hui" : next.offset === 1 ? "demain" : DAY_FR[next.day];
+  return { open: false, label: `Fermé · ouvre ${when} à ${frHour(next.open)}` };
 }
