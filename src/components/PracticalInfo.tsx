@@ -107,7 +107,7 @@ export function PracticalInfo({
         <Link href="/mentions-legales">Mentions légales</Link>
         <Link href="/mentions-legales#conditions">Conditions de commande</Link>
         <Link href="/confidentialite">Confidentialité</Link>
-        <Link href="/pizzeria">Espace restaurant</Link>
+        <Link href="/gerant">Espace gérant</Link>
       </div>
     </footer>
   );

@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { toSettings } from "@/lib/data";
 import { computeOrderingWindow, parisWallTimeToDate } from "@/lib/time";
 import { orderErrorMessage, STALE_DATA_CODES } from "./errors";
+import { forwardOrderToRestaurant } from "./forward";
 import type { OrderInput } from "./validation";
 
 export interface OrderConfirmation {
@@ -88,6 +89,18 @@ export async function createOrder(input: OrderInput): Promise<CreateOrderResult>
     .eq("order_date", window.today)
     .eq("order_number", row.order_number)
     .single();
+
+  try {
+    await forwardOrderToRestaurant({
+      number: Number(row.order_number),
+      date: window.today,
+      pickup: input.pickup,
+      name: input.name,
+      total: Number(row.total),
+    });
+  } catch (e) {
+    console.error("[createOrder] transmission au restaurant", e);
+  }
 
   return {
     ok: true,

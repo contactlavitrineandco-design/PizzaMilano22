@@ -3,8 +3,9 @@ import { createClient } from "@supabase/supabase-js";
 import { publicSupabaseEnv } from "@/lib/env";
 
 /**
- * Client « service » : contourne RLS. Utilisé UNIQUEMENT pour appeler la
- * fonction create_order() depuis une action serveur. L'import "server-only"
+ * Client « service » : contourne RLS. Utilisé UNIQUEMENT côté serveur : création
+ * des commandes (create_order), suivi client, et actions de l'espace gérant après
+ * vérification de la session (isAdmin). L'import "server-only"
  * fait échouer la compilation si ce fichier est importé côté navigateur.
  */
 export function createAdminClient() {

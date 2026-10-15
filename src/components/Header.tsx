@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 export function Header() {
   const pathname = usePathname();
-  const pro = pathname.startsWith("/pizzeria") || pathname.startsWith("/login");
+  const pro = pathname.startsWith("/gerant");
   return (
     <header className="top">
       <div className="wrap">

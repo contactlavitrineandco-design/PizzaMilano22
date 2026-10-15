@@ -60,12 +60,6 @@ export default async function Confidentialite() {
                 <td>Même durée que la commande</td>
               </tr>
               <tr>
-                <td>Adresse e-mail des comptes du personnel</td>
-                <td>Accès sécurisé à l&apos;espace pizzeria</td>
-                <td>Intérêt légitime</td>
-                <td>Jusqu&apos;à la suppression du compte</td>
-              </tr>
-              <tr>
                 <td>Données techniques de connexion (adresse IP, navigateur)</td>
                 <td>Sécurité et bon fonctionnement du site, chez l&apos;hébergeur</td>
                 <td>Intérêt légitime</td>
@@ -78,7 +72,7 @@ export default async function Confidentialite() {
 
         <h2>Destinataires</h2>
         <p>
-          Seul le personnel de {s.restaurant_name} voit vos commandes. Deux prestataires techniques les hébergent pour notre
+          Seule la pizzeria {s.restaurant_name} reçoit vos commandes. Deux prestataires techniques les hébergent pour notre
           compte : {LEGAL.hebergeur.nom} (hébergement du site, États-Unis) et {LEGAL.baseDeDonnees.nom} (base de données,
           région <LegalField value={LEGAL.baseDeDonnees.region} label="région du projet Supabase" />). Les transferts
           éventuels hors de l&apos;Union européenne sont encadrés par les garanties prévues par ces prestataires (clauses
@@ -91,14 +85,14 @@ export default async function Confidentialite() {
           Le site n&apos;utilise ni cookie publicitaire ni outil de mesure d&apos;audience. Il enregistre dans votre
           navigateur votre panier et le numéro de votre dernière commande, pour que vous puissiez les retrouver. Ces
           informations sont strictement nécessaires au service demandé et ne nécessitent donc pas de consentement. Un cookie de
-          connexion est utilisé uniquement dans l&apos;espace réservé au personnel. Les polices de caractères sont hébergées
+          connexion est utilisé uniquement dans l&apos;espace réservé au gérant. Les polices de caractères sont hébergées
           par le site lui-même. La carte Google Maps n&apos;est chargée que si vous cliquez sur « Afficher la carte » :
           Google peut alors déposer ses propres cookies, selon sa politique de confidentialité.
         </p>
 
         <h2>Sécurité</h2>
         <p>
-          Connexion chiffrée (HTTPS), accès aux commandes réservé aux comptes du personnel, prix et totaux recalculés par le
+          Connexion chiffrée (HTTPS), accès aux commandes réservé à la pizzeria, espace de gestion protégé par un code, prix et totaux recalculés par le
           serveur, base de données protégée par des règles d&apos;accès strictes.
         </p>
 

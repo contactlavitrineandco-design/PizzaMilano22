@@ -39,7 +39,7 @@ export function Hero({
           </p>
           <p>
             Choisissez vos pizzas sur la carte, indiquez l&apos;heure de retrait et réglez au comptoir. Votre commande
-            arrive directement sur la tablette du pizzaïolo.
+            est transmise directement à la pizzeria.
           </p>
           {/* La commande d'abord : bouton principal visible dès l'arrivée */}
           <div className="hero-actions">

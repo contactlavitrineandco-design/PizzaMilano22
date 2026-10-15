@@ -32,6 +32,10 @@ const { patterns, local } = supabasePhotoPatterns();
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  experimental: {
+    // Photos envoyées depuis l'espace gérant (déjà réduites dans le navigateur, 5 Mo maximum)
+    serverActions: { bodySizeLimit: "6mb" },
+  },
   images: {
     remotePatterns: patterns,
     dangerouslyAllowLocalIP: local,
@@ -56,6 +60,14 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'",
           },
+        ],
+      },
+      {
+        // Espace gérant : jamais mis en cache, jamais indexé
+        source: "/gerant",
+        headers: [
+          { key: "Cache-Control", value: "no-store, private" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
         ],
       },
     ];

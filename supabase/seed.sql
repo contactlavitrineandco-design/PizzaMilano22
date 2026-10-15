@@ -135,11 +135,3 @@ select 'pizzas', '/photos/carte/neptune.webp',
        'Pizza Neptune du restaurant : thon, poivrons, oignons rouges et olives noires, devant le mur en lattes de bois',
        'Tout juste sortie du four', 'restaurant', 10
 where not exists (select 1 from public.gallery_photos where image_path = '/photos/carte/neptune.webp');
-
--- ---------------------------------------------------------------------
--- Compte du restaurant pour la page des commandes (/pizzeria) : à faire une
--- fois le compte créé dans Supabase > Authentication > Users (voir README) :
---
--- insert into public.staff (user_id, role)
--- select id, 'admin' from auth.users where email = 'prenom@exemple.fr';
--- ---------------------------------------------------------------------

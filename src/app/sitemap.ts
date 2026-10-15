@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteUrl } from "@/lib/site";
 
-// Pages indexables (/commander, /commande, /login et /pizzeria sont en noindex).
+// Pages indexables (/commander, /commande et /gerant sont en noindex).
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteUrl();
   return [

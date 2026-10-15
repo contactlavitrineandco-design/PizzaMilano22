@@ -1,9 +1,9 @@
 # Pizza Milano
 
-Site de la pizzeria Pizza Milano (Saint-Brieuc) : carte avec photos, **commande en ligne à emporter avec paiement au comptoir**, et une page des commandes pour le restaurant (tablette ou téléphone).
+Site de la pizzeria Pizza Milano (Saint-Brieuc) : carte avec photos, **commande en ligne à emporter avec paiement au comptoir**, et un **espace gérant protégé par un code** pour modifier le site.
 
 - **Next.js 16** (App Router) + **TypeScript**
-- **Supabase** : base Postgres, connexion du restaurant, temps réel
+- **Supabase** : base Postgres, stockage des photos
 - Design de la maquette (lattes de bois, néon du chef, kraft, touches tricolores), CSS dans `src/app/globals.css`
 
 | Route | Rôle |
@@ -13,18 +13,37 @@ Site de la pizzeria Pizza Milano (Saint-Brieuc) : carte avec photos, **commande 
 | `/commande/<jeton>` | Suivi de sa commande par le client, annulation tant qu'elle n'est pas lancée |
 | `/mentions-legales` | Mentions légales + conditions de commande |
 | `/confidentialite` | Politique de confidentialité |
-| `/login` | Connexion du restaurant |
-| `/pizzeria` | Page des commandes : nouvelles / au four / prêtes, alerte sonore, ruptures, pause des commandes en ligne |
+| `/gerant` | **Espace gérant** (code d'accès) : commandes en ligne ouvertes / en pause, horaires, carte (noms, ingrédients, prix, épuisé, ajout, suppression), photos, suppléments, coordonnées, changement du code |
 
 ---
 
-## Commande et paiement (15/10/2026)
+## Commandes et SumUp (15/10/2026)
 
-- Le client choisit ses pizzas, son heure de retrait, donne son prénom et son téléphone, et envoie. Il reçoit un numéro de commande.
-- **Le paiement se fait au comptoir, au retrait.** Rien n'est payé en ligne, aucune carte bancaire n'est demandée. C'est écrit dans le bandeau (« 3. Payez au comptoir en récupérant », pastille « Paiement au comptoir »), dans le panier, juste au-dessus du bouton d'envoi, sur le ticket de confirmation, en bas de page et dans les conditions de commande.
-- Les commandes arrivent en temps réel sur **la page des commandes** (`/pizzeria`), à ouvrir sur une tablette ou un téléphone au comptoir. Touchez « Activer le son » une fois après l'ouverture : chaque nouvelle commande sonne (le navigateur n'autorise le son qu'après un clic). Le lien « Espace restaurant » est en bas de chaque page.
-- La caisse SumUp ne peut pas recevoir les commandes d'un site extérieur (son API ne transmet qu'un montant à un lecteur de carte). Le restaurant encaisse la commande sur la caisse SumUp au moment du retrait, comme une vente au comptoir.
-- Il n'y a ni historique ni statistiques : les ventes sont dans la caisse SumUp.
+- Le client choisit ses pizzas, son heure de retrait, donne son prénom et son téléphone, et envoie. Il reçoit un numéro de commande et un lien de suivi.
+- **Le paiement se fait au comptoir, au retrait.** Rien n'est payé en ligne, aucune carte bancaire n'est demandée. C'est écrit dans le bandeau (« 3. Payez au comptoir en récupérant », pastille « Paiement au comptoir »), dans le panier juste au-dessus du bouton d'envoi, sur le ticket de confirmation, en bas de page et dans les conditions de commande.
+- **Le restaurant veut recevoir les commandes sur sa caisse SumUp. Ce branchement reste à définir avec SumUp.** SumUp ne publie pas d'interface permettant à un site extérieur de créer une commande détaillée sur sa caisse (son API « Cloud » ne transmet qu'un montant à un lecteur de carte Solo). Leur offre de commande en ligne, Order & Pay (Caisse Plus), fonctionne avec sa propre page de commande, pas avec ce site.
+- Le point de branchement est prêt : `src/lib/orders/forward.ts`, appelé après chaque commande. Il ne fait rien pour l'instant : **aucune fausse intégration**.
+- **Tant que ce branchement n'existe pas, les commandes sont seulement enregistrées dans la base** (Supabase > Table Editor > `orders`) et n'apparaissent nulle part au comptoir. L'ancien écran des commandes du restaurant a été retiré à votre demande. **Gardez les commandes en ligne « en pause » dans l'espace gérant** jusqu'à ce que la transmission fonctionne, sinon des clients viendraient chercher des commandes que personne n'a vues.
+
+---
+
+## Espace gérant (`/gerant`)
+
+Le gérant ouvre `https://votre-site/gerant` (lien « Espace gérant » discret en bas de chaque page) et saisit son **code d'accès**.
+
+- **Code de départ : `220000`.** Un rappel s'affiche tant qu'il n'est pas changé. Changez-le dès la mise en ligne (rubrique « Code d'accès ») : 6 à 12 chiffres, ni chiffres identiques ni chiffres qui se suivent.
+- Ce qu'on peut faire : ouvrir ou mettre en pause les commandes en ligne ; modifier les horaires (2 plages par jour, plage de nuit possible) ; modifier nom, ingrédients, prix, badge de chaque produit, le passer en « Épuisé », en ajouter, en supprimer (un produit déjà commandé ne se supprime pas : passez-le en « Épuisé ») ; changer ou retirer sa photo (prise au téléphone ou choisie, réduite et nettoyée de ses données GPS avant l'envoi) ; prix et disponibilité des suppléments ; téléphone, lien Instagram, délai de préparation ; changer le code.
+- Les changements sont visibles immédiatement sur le site.
+
+**Sécurité de l'accès**
+
+- Le code n'est jamais stocké en clair : la base garde son empreinte (bcrypt) et le vérifie elle-même (`verify_admin_code`), uniquement à la demande du serveur.
+- 5 erreurs en 15 minutes depuis un même appareil, ou 30 au total, bloquent les essais 15 minutes.
+- Après un bon code, le serveur pose un cookie de session **signé** (HMAC, secret `ADMIN_SESSION_SECRET`), `httpOnly`, `SameSite=Strict`, limité à `/gerant`, valable 12 heures. Un cookie modifié ou expiré est refusé.
+- **Changer le code déconnecte tous les autres appareils.**
+- Chaque action du gérant revérifie la session côté serveur et valide les données ; la base garde ses propres contraintes (prix, horaires, chemins de photos). La clé publique ne peut rien modifier.
+- La page n'est ni mise en cache ni indexée par Google.
+- Un code de 6 chiffres reste devinable par quelqu'un de très patient malgré le blocage : un code plus long (8 chiffres ou plus) est plus sûr.
 
 ---
 
@@ -43,9 +62,9 @@ npm install
 **Option A : projet Supabase en ligne (le plus simple)**
 
 1. Créez un projet sur supabase.com (région Europe, par exemple Paris ou Francfort).
-2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (dans l'ordre des noms : `…_init`, `…_photos` qui crée aussi le stockage des photos, `…_seo`, `…_photos_hd`, `…_photos_ia`, `…_annulation`, `…_photos_nettes_legal`, `…_coordonnees_galerie`, `…_photos_tartiflette_burrata`, `…_photos_4fromages_vege_paysanne`, `…_horaires_nuit_instagram`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
+2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (dans l'ordre des noms : `…_init`, `…_photos` qui crée aussi le stockage des photos, `…_seo`, `…_photos_hd`, `…_photos_ia`, `…_annulation`, `…_photos_nettes_legal`, `…_coordonnees_galerie`, `…_photos_tartiflette_burrata`, `…_photos_4fromages_vege_paysanne`, `…_horaires_nuit_instagram`, `…_espace_gerant`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
    Avec la CLI, c'est équivalent à : `npx supabase link --project-ref <ref>` puis `npm run db:push`, et le seed dans le SQL Editor.
-3. Dans **Authentication > Sign In / Providers**, **désactivez les inscriptions** (« Allow new users to sign up »). Seul le compte que vous créez pour le restaurant doit exister.
+3. Dans **Authentication > Sign In / Providers**, **désactivez les inscriptions** (« Allow new users to sign up ») : le site n'utilise aucun compte.
 
 **Option B : Supabase en local (nécessite Docker)**
 
@@ -66,19 +85,12 @@ cp .env.example .env.local
 | `NEXT_PUBLIC_SUPABASE_URL` | navigateur + serveur | non |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | navigateur + serveur (clé « anon » ou « publishable ») | non |
 | `NEXT_PUBLIC_SITE_URL` | adresse publique du site, ex. `https://www.mondomaine.fr` (balises canoniques, sitemap, Google) | non |
-| `SUPABASE_SERVICE_ROLE_KEY` | **serveur uniquement** (création des commandes) — clé « service_role » ou « secret » | **oui** |
+| `SUPABASE_SERVICE_ROLE_KEY` | **serveur uniquement** (création des commandes, espace gérant) — clé « service_role » ou « secret » | **oui** |
+| `ADMIN_SESSION_SECRET` | **serveur uniquement** : signe la session de l'espace gérant. 32 caractères au hasard minimum (`node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`) | **oui** |
 
-### 4. Créer le compte du restaurant
+### 4. Espace gérant
 
-1. **Authentication > Users > Add user** : e-mail + mot de passe solide, cochez « Auto confirm user ».
-2. Dans le **SQL Editor** :
-
-```sql
-insert into public.staff (user_id, role)
-select id, 'admin' from auth.users where email = 'adresse@du-restaurant.fr';
-```
-
-Un compte Supabase qui n'est pas dans `staff` ne peut **pas** ouvrir `/pizzeria`, même connecté.
+Rien à créer : le code de départ `220000` est installé par la migration `…_espace_gerant`. Ouvrez `/gerant` et changez-le.
 
 ### 5. Lancer
 
@@ -105,8 +117,8 @@ npm run dev     # http://localhost:3000
 ## Déploiement sur Vercel
 
 1. Poussez le projet sur GitHub, puis importez-le dans Vercel (framework détecté automatiquement).
-2. Ajoutez les quatre variables d'environnement dans **Settings > Environment Variables**. `SUPABASE_SERVICE_ROLE_KEY` ne doit jamais être préfixée par `NEXT_PUBLIC_`.
-3. Dans Supabase, **Authentication > URL Configuration**, mettez l'URL Vercel comme « Site URL ».
+2. Ajoutez les cinq variables d'environnement dans **Settings > Environment Variables**. `SUPABASE_SERVICE_ROLE_KEY` et `ADMIN_SESSION_SECRET` ne doivent jamais être préfixées par `NEXT_PUBLIC_`.
+3. Ouvrez `/gerant`, entrez `220000`, puis choisissez votre propre code.
 
 ---
 
@@ -118,18 +130,17 @@ src/
     page.tsx               /                bandeau + carte + panier + galerie + infos pratiques
     commander/             /commander       formulaire ; actions.ts = action serveur submitOrder
     commande/[token]/      suivi et annulation par le client
-    login/                 connexion du restaurant
-    pizzeria/              page des commandes (temps réel, alerte sonore, ruptures)
+    gerant/                espace gérant : page, connexion par code, tableau de bord, actions serveur
     mentions-legales/      confidentialite/
   components/              Header, Hero, Shop (carte + panier), cart-store, my-order, ProductImage,
                            PizzeriaGallery, MapEmbed, Lightbox, PracticalInfo, LegalField
   lib/
     orders/                validation serveur, création, suivi, messages d'erreur
+    orders/forward.ts      point de branchement vers la caisse (SumUp, à définir)
+    admin-session.ts       session de l'espace gérant (cookie signé)
+    image-prep.ts          réduction des photos dans le navigateur avant envoi
     time.ts                horaires, créneaux, ouvert / fermé, fuseau Europe/Paris, plages de nuit
     supabase/admin.ts      clé service — "server-only", jamais dans le navigateur
-    supabase/server.ts     client lié à la session (cookies)
-    supabase/browser.ts    client navigateur (clé publique, temps réel)
-  proxy.ts                 rafraîchit la session, redirige /pizzeria sans session vers /login
 supabase/
   migrations/              historique complet du schéma
   seed.sql                 carte, suppléments, réglages, photos
@@ -139,10 +150,10 @@ supabase/
 
 | Qui | Peut | Ne peut pas |
 | --- | --- | --- |
-| **Client** (anonyme) | lire la carte ; créer une commande via l'action serveur ; suivre et annuler **sa** commande avec son lien secret | lire ou modifier les commandes ; appeler `create_order()` directement |
-| **Restaurant** (compte dans `staff`) | lire les commandes ; changer leur statut ; gérer les ruptures ; mettre les commandes en ligne en pause | modifier prix, totaux ou contenu des commandes |
+| **Client** (anonyme) | lire la carte ; créer une commande via l'action serveur ; suivre et annuler **sa** commande avec son lien secret | lire ou modifier les commandes ; appeler `create_order()` directement ; modifier la carte |
+| **Gérant** (code + session signée) | modifier la carte, les prix, les photos, les horaires, les coordonnées ; ouvrir ou mettre en pause les commandes | lire le code stocké ; contourner le blocage après 5 erreurs |
 
-- RLS sur toutes les tables ; `orders`, `order_items`, `order_counters` fermées à la clé publique.
+- RLS sur toutes les tables ; `orders`, `order_items`, `order_counters`, `admin_access`, `admin_login_attempts` fermées à la clé publique.
 - Prix et total recalculés en base ; validation serveur ; anti-abus (champ piège, 3 commandes maximum par téléphone en 15 minutes).
 - `payment_status` reste `pending` (« À encaisser ») : la création d'une commande ne la rend jamais « payée ».
 - En-têtes : HTTPS forcé (HSTS), pas d'intégration dans une autre page, pas d'accès caméra / micro / position.
@@ -178,25 +189,14 @@ La section présente la pizzeria en quelques lignes, affiche la première photo 
 - Photos d'illustration IA (Canva), même fond que les vraies : Margherita, Milano, Reine, Boursalino, 4 Saisons, Mexicaine, Chicken, Tartiflette, Burrata, 4 Fromages, Végétarienne, Paysanne.
 - Sans photo : 5 Fromages, Chèvre Miel.
 
-**Changer une photo** (dans Supabase, la page des commandes ne gère pas les photos) :
-
-1. **Storage > photos** : envoyez l'image (JPEG, PNG ou WebP, 5 Mo maximum) dans le dossier `products/` (ou `gallery/`). Retirez d'abord les métadonnées GPS d'une photo de téléphone (une capture d'écran de la photo suffit).
-2. **SQL Editor** :
-
-```sql
-update public.products
-set image_path = 'products/nom-du-fichier.webp', image_source = 'restaurant', image_alt = 'Pizza Reine : …', image_updated_at = now()
-where name = 'La Reine';
-```
-
-`image_source = 'illustration'` pour une image qui ne vient pas du restaurant. La base n'accepte que les chemins du site (`/photos/…`) ou du bucket (`products/…`, `gallery/…`), jamais une URL externe.
+**Changer une photo** : espace gérant > « Carte et photos » > le produit > « Changer la photo ». Choisissez l'origine : « Photo prise chez Pizza Milano » ou « Image d'illustration » (affichée avec la mention). La photo est réduite à 1600 px et réencodée dans le navigateur (ce qui retire la position GPS), puis le serveur vérifie que c'est bien une image JPEG, PNG ou WebP de moins de 5 Mo avant de la publier dans Supabase Storage. L'ancienne photo est supprimée du stockage. Les photos de la galerie « Découvrez notre pizzeria » se changent dans Supabase (table `gallery_photos`).
 
 ### Référencement (SEO)
 
 - **Page indexée** : l'accueil `/`, qui contient la carte complète, la galerie et les infos pratiques. Titre « Pizza Milano · Pizzeria à emporter à Saint-Brieuc », description, canonique, image de partage `public/og.jpg`.
 - **`/sitemap.xml` et `/robots.txt`** générés à partir de `NEXT_PUBLIC_SITE_URL`.
 - **Données structurées** `Restaurant` + `Menu` construites uniquement à partir de la base : adresse, téléphone, GPS, lien Maps, horaires, Instagram (`sameAs`).
-- `/commander`, `/commande/…`, `/login` et `/pizzeria` sont en `noindex`.
+- `/commander`, `/commande/…` et `/gerant` sont en `noindex`.
 - **Vérifier après déploiement** : `/robots.txt`, `/sitemap.xml`, le [test des résultats enrichis](https://search.google.com/test/rich-results) et [PageSpeed Insights](https://pagespeed.web.dev/).
 
 ---
@@ -250,7 +250,8 @@ where name = 'La Reine';
 
 ## Limites connues
 
+- **Les commandes du site n'arrivent pas encore sur la caisse SumUp** (voir « Commandes et SumUp ») : gardez les commandes en ligne en pause jusqu'au branchement.
 - Seuls les numéros français (fixe ou mobile) sont acceptés.
-- Le son de la page des commandes doit être réactivé (un clic) à chaque ouverture de la page.
 - Les commandes sur place ou par téléphone ne passent pas par le site : elles se saisissent dans la caisse comme avant.
-- Le badge « Ouvert / Fermé » suit les horaires enregistrés, pas les fermetures exceptionnelles : utilisez le bouton « Commandes en ligne : en pause » de la page des commandes.
+- Le badge « Ouvert / Fermé » suit les horaires enregistrés, pas les fermetures exceptionnelles : mettez les commandes en ligne en pause depuis l'espace gérant.
+- Si le gérant oublie son code : dans Supabase > SQL Editor, `update public.admin_access set code_hash = extensions.crypt('NOUVEAU_CODE', extensions.gen_salt('bf', 10)), version = version + 1 where id = 1;`
