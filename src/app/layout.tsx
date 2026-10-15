@@ -1,11 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Header } from "@/components/Header";
-import { getSettings } from "@/lib/data";
 import { DEFAULT_CITY, siteUrl } from "@/lib/site";
 import { alegreya, figtree, jetbrainsMono } from "./fonts";
 import "./globals.css";
 
-const description = `Pizzeria à emporter à ${DEFAULT_CITY} : pizzas base tomate ou crème, soufflés et boissons fraîches. Commandez en ligne ou par téléphone, retirez au comptoir.`;
+const description = `Pizzeria à emporter à ${DEFAULT_CITY} : pizzas base tomate ou crème, soufflés et boissons fraîches. Commandez en ligne, retirez et payez au comptoir.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -35,13 +34,11 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // Le bouton « Commander » de l'en-tête suit le lien SumUp des réglages ; sans réglages, il est masqué.
-  const settings = await getSettings().catch(() => null);
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className={`${alegreya.variable} ${figtree.variable} ${jetbrainsMono.variable}`}>
       <body>
-        <Header settings={settings} />
+        <Header />
         {children}
       </body>
     </html>

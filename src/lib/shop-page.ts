@@ -1,11 +1,13 @@
 import "server-only";
+import { closedBanner } from "@/lib/banner";
 import { getMenuData } from "@/lib/data";
 import { DEFAULT_CITY } from "@/lib/site";
-import { openStatus } from "@/lib/time";
+import { computeOrderingWindow, openStatus } from "@/lib/time";
 
-/** Données de la page d'accueil (vitrine) : carte, réglages, ouvert ou fermé. */
+/** Données communes aux pages / et /commander. */
 export async function loadShop() {
   const { products, supplements, settings } = await getMenuData();
+  const ordering = computeOrderingWindow(settings);
   const minPrice = (cat: string) => {
     const prices = products.filter((p) => p.category === cat).map((p) => p.price);
     return prices.length ? Math.min(...prices) : null;
@@ -17,7 +19,9 @@ export async function loadShop() {
     supplements,
     settings,
     city: settings.city ?? DEFAULT_CITY,
+    ordering,
     status: settings.opening_hours_provisional ? null : openStatus(settings.opening_hours),
+    banner: closedBanner(ordering.reason),
     prices: {
       pizzaFrom: Number.isFinite(pizzaFrom) ? pizzaFrom : null,
       souffle: minPrice("souffle"),

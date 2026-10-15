@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteUrl } from "@/lib/site";
 
-// Pages indexables (/commander n'est qu'une redirection vers la commande SumUp).
+// Pages indexables (/commander, /commande, /login et /pizzeria sont en noindex).
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteUrl();
   return [

@@ -1,8 +1,7 @@
+import Link from "next/link";
 import { eur } from "@/lib/format";
 import type { OpenStatus } from "@/lib/time";
-import type { RestaurantSettings } from "@/lib/types";
 import { NeonChef } from "./NeonChef";
-import { OrderButton } from "./OrderButton";
 
 export interface HeroPrices {
   pizzaFrom: number | null;
@@ -13,17 +12,22 @@ export interface HeroPrices {
 const euro = (v: number) => (Number.isInteger(v) ? `${v} €` : eur(v));
 
 export function Hero({
-  settings,
+  banner,
   prices,
   city,
-  status,
+  cta,
+  showMenuLink,
+  status = null,
 }: {
-  settings: RestaurantSettings;
+  banner: string | null;
   prices: HeroPrices;
   city: string;
-  status: OpenStatus | null;
+  /** Bouton principal du bandeau (la commande d'abord). */
+  cta: { href: string; label: string };
+  showMenuLink: boolean;
+  /** Ouvert / fermé maintenant (null tant que les horaires sont provisoires). */
+  status?: OpenStatus | null;
 }) {
-  const online = Boolean(settings.order_url);
   return (
     <section className="hero slats">
       <div className="wrap">
@@ -34,16 +38,19 @@ export function Hero({
             Commandez, on enfourne, <em>vous passez récupérer.</em>
           </p>
           <p>
-            {online
-              ? "Choisissez vos pizzas, votre heure de retrait et réglez en ligne : votre commande arrive directement en caisse chez Pizza Milano."
-              : "Appelez-nous pour commander, on vous donne l'heure de retrait. Ou passez directement au comptoir."}
+            Choisissez vos pizzas sur la carte, indiquez l&apos;heure de retrait et réglez au comptoir. Votre commande
+            arrive directement sur la tablette du pizzaïolo.
           </p>
           {/* La commande d'abord : bouton principal visible dès l'arrivée */}
           <div className="hero-actions">
-            <OrderButton settings={settings} />
-            <a className="ghost" href="#carte">
-              Voir la carte
-            </a>
+            <Link className="cta" href={cta.href}>
+              {cta.label}
+            </Link>
+            {showMenuLink && (
+              <a className="ghost" href="#carte">
+                Voir la carte
+              </a>
+            )}
           </div>
           {status && (
             <p className={`open-status${status.open ? " is-open" : ""}`}>
@@ -51,6 +58,17 @@ export function Hero({
               {status.label}
             </p>
           )}
+          <ol className="how-steps" aria-label="Comment commander">
+            <li>
+              <b>1</b> Choisissez vos pizzas
+            </li>
+            <li>
+              <b>2</b> Indiquez l&apos;heure de retrait
+            </li>
+            <li>
+              <b>3</b> Payez au comptoir en récupérant
+            </li>
+          </ol>
           <div className="chips">
             {prices.pizzaFrom !== null && (
               <span className="chip">
@@ -67,7 +85,11 @@ export function Hero({
                 Canettes <b>{euro(prices.can)}</b>
               </span>
             )}
+            <span className="chip">
+              <b>Paiement au comptoir</b>, au retrait
+            </span>
           </div>
+          {banner && <div className="closed-banner">{banner}</div>}
         </div>
         <NeonChef />
       </div>

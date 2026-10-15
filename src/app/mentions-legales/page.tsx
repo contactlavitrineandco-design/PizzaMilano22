@@ -9,7 +9,7 @@ import { DEFAULT_CITY } from "@/lib/site";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Mentions légales et conditions de commande",
-  description: "Éditeur du site, hébergement et conditions de commande de Pizza Milano.",
+  description: "Éditeur du site, hébergement et conditions de commande en ligne de Pizza Milano.",
   alternates: { canonical: "/mentions-legales" },
 };
 
@@ -69,7 +69,7 @@ export default async function MentionsLegales() {
           <a href={LEGAL.hebergeur.site} rel="noopener" target="_blank">
             vercel.com
           </a>
-          ). Carte, photos et réglages du site hébergés par {LEGAL.baseDeDonnees.nom} (
+          ). Base de données et commandes hébergées par {LEGAL.baseDeDonnees.nom} (
           <a href={LEGAL.baseDeDonnees.site} rel="noopener" target="_blank">
             supabase.com
           </a>
@@ -83,25 +83,31 @@ export default async function MentionsLegales() {
           générées par intelligence artificielle et ne sont pas contractuelles.
         </p>
 
-        <h2 id="conditions">Conditions de commande</h2>
+        <h2 id="conditions">Conditions de commande en ligne</h2>
         <ol className="legal-list">
           <li>
-            <b>Commande.</b> Pizzas, soufflés et boissons à emporter, à retirer au restaurant à {DEFAULT_CITY}. Il n&apos;y a
-            pas de livraison. Le site présente la carte : la commande se fait par téléphone, au comptoir ou, lorsque le
-            bouton « Commander en ligne » est affiché, sur la page de commande de notre prestataire de caisse et de paiement,
-            SumUp. Ses propres conditions s&apos;appliquent alors à la commande en ligne et au paiement.
+            <b>Commande.</b> Le site permet de commander des pizzas, soufflés et boissons à retirer au restaurant, à {DEFAULT_CITY}, sur un
+            créneau proposé lors de la commande. Il n&apos;y a pas de livraison depuis ce site.
           </li>
           <li>
-            <b>Prix.</b> Les prix sont indiqués en euros, toutes taxes comprises. Le prix à payer est celui de la caisse du
-            restaurant au moment de la commande.
+            <b>Prix.</b> Les prix sont indiqués en euros, toutes taxes comprises. Le total est calculé par le restaurant au moment
+            de la commande et affiché sur la confirmation.
           </li>
           <li>
-            <b>Paiement.</b> Au comptoir, ou en ligne sur la page de commande SumUp. Le site Pizza Milano ne demande ni ne
-            conserve aucune donnée bancaire.
+            <b>Confirmation.</b> Un numéro de commande s&apos;affiche dès l&apos;envoi. La commande est transmise directement au
+            restaurant.
+          </li>
+          <li>
+            <b>Paiement.</b> Le paiement se fait au comptoir, lors du retrait. Aucune donnée bancaire n&apos;est demandée sur le
+            site.
+          </li>
+          <li>
+            <b>Annulation.</b> Vous pouvez annuler en ligne, depuis le lien « Suivre ou annuler ma commande », tant que la
+            commande n&apos;est pas en préparation. Ensuite, contactez le restaurant.
           </li>
           <li>
             <b>Droit de rétractation.</b> Il ne s&apos;applique pas aux denrées alimentaires susceptibles de se détériorer
-            rapidement (article L221-28, 4° du Code de la consommation). Pour un empêchement, appelez le restaurant.
+            rapidement (article L221-28, 4° du Code de la consommation).
           </li>
           <li>
             <b>Allergènes.</b> La liste des allergènes de chaque produit est disponible sur simple demande au comptoir ou par
@@ -123,7 +129,7 @@ export default async function MentionsLegales() {
           <Link href="/confidentialite">politique de confidentialité</Link>.
         </p>
       </main>
-      <PracticalInfo settings={s} city={s.city ?? DEFAULT_CITY} pizzaFrom={null} />
+      <PracticalInfo settings={s} city={s.city ?? DEFAULT_CITY} pizzaFrom={null} showOrderLink />
     </>
   );
 }

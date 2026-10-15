@@ -1,40 +1,30 @@
 # Pizza Milano
 
-Site vitrine de la pizzeria Pizza Milano (Saint-Brieuc) : carte avec photos, horaires, coordonnées, Instagram et bouton **« Commander »**. Les commandes en ligne passent par **SumUp** et arrivent directement sur la caisse du restaurant.
+Site de la pizzeria Pizza Milano (Saint-Brieuc) : carte avec photos, **commande en ligne à emporter avec paiement au comptoir**, et une page des commandes pour le restaurant (tablette ou téléphone).
 
 - **Next.js 16** (App Router) + **TypeScript**
-- **Supabase** : carte, photos et réglages (lecture seule pour le public)
+- **Supabase** : base Postgres, connexion du restaurant, temps réel
 - Design de la maquette (lattes de bois, néon du chef, kraft, touches tricolores), CSS dans `src/app/globals.css`
 
 | Route | Rôle |
 | --- | --- |
-| `/` | Bandeau avec « Commander », ouvert / fermé, carte, galerie, carte Google, infos pratiques |
-| `/commander` | Adresse courte à partager : renvoie vers la page de commande SumUp (ou vers la carte tant qu'elle n'est pas renseignée) |
+| `/` | Bandeau (ouvert / fermé, « Commander », 3 étapes), carte, panier, galerie, carte Google, infos pratiques |
+| `/commander` | Carte + panier + formulaire (prénom, téléphone, heure de retrait, remarque) |
+| `/commande/<jeton>` | Suivi de sa commande par le client, annulation tant qu'elle n'est pas lancée |
 | `/mentions-legales` | Mentions légales + conditions de commande |
 | `/confidentialite` | Politique de confidentialité |
+| `/login` | Connexion du restaurant |
+| `/pizzeria` | Page des commandes : nouvelles / au four / prêtes, alerte sonore, ruptures, pause des commandes en ligne |
 
 ---
 
-## Commandes : SumUp (15/10/2026)
+## Commande et paiement (15/10/2026)
 
-Le restaurant encaisse avec la **caisse SumUp**. Il veut que les commandes du site arrivent directement dessus. SumUp ne propose pas de moyen public pour qu'un site extérieur envoie une commande détaillée à sa caisse : son API « Cloud » ne sert qu'à envoyer un **montant** à un lecteur de carte Solo. La solution prévue par SumUp est sa propre commande en ligne, **SumUp Order & Pay** : les clients commandent et paient depuis leur téléphone, choisissent une heure de retrait, et la commande part vers le poste de préparation. D'après la page de SumUp, elle est incluse dans l'offre **Caisse Plus** (49 € par mois, 2,50 % par transaction) : à vérifier avec SumUp pour le compte du restaurant.
-
-**Ce que fait le site** : le bouton « Commander » (en-tête, bandeau, sous la carte, barre en bas sur mobile, pied de page) ouvre la page de commande SumUp du restaurant. Tant que le lien n'est pas renseigné, il devient « Commander au 06 50 64 73 89 » (appel direct).
-
-**À faire par le restaurant**
-
-1. Activer la commande en ligne dans son compte SumUp et récupérer le lien de sa page de commande.
-2. Le renseigner (Supabase > SQL Editor) :
-
-```sql
-update public.restaurant_settings set order_url = 'https://…' where id = 1;
-```
-
-Seuls les liens `https://` sont acceptés. Le changement est visible tout de suite, sans redéployer.
-
-3. Vérifier que **la carte SumUp correspond à celle du site** (noms, prix, ingrédients). Sur la photo de la caisse du 15/10/2026, on voit par exemple « Hawaï » à 2,00 €, « Indienne » et « La Poulet », qui ne sont pas sur le site.
-
-**Ce qui a été retiré** : panier, formulaire de commande, numéro de commande, suivi et annulation en ligne, espace pizzeria (tablette, historique, code d'accès, gestion des photos), connexion du personnel. La caisse SumUp fournit le suivi des commandes et les rapports de ventes. La migration `…_vitrine_sumup` supprime les tables de commandes ; elle **refuse de s'exécuter** si la table `orders` contient déjà des commandes (il faudrait alors les exporter d'abord).
+- Le client choisit ses pizzas, son heure de retrait, donne son prénom et son téléphone, et envoie. Il reçoit un numéro de commande.
+- **Le paiement se fait au comptoir, au retrait.** Rien n'est payé en ligne, aucune carte bancaire n'est demandée. C'est écrit dans le bandeau (« 3. Payez au comptoir en récupérant », pastille « Paiement au comptoir »), dans le panier, juste au-dessus du bouton d'envoi, sur le ticket de confirmation, en bas de page et dans les conditions de commande.
+- Les commandes arrivent en temps réel sur **la page des commandes** (`/pizzeria`), à ouvrir sur une tablette ou un téléphone au comptoir. Touchez « Activer le son » une fois après l'ouverture : chaque nouvelle commande sonne (le navigateur n'autorise le son qu'après un clic). Le lien « Espace restaurant » est en bas de chaque page.
+- La caisse SumUp ne peut pas recevoir les commandes d'un site extérieur (son API ne transmet qu'un montant à un lecteur de carte). Le restaurant encaisse la commande sur la caisse SumUp au moment du retrait, comme une vente au comptoir.
+- Il n'y a ni historique ni statistiques : les ventes sont dans la caisse SumUp.
 
 ---
 
@@ -53,9 +43,9 @@ npm install
 **Option A : projet Supabase en ligne (le plus simple)**
 
 1. Créez un projet sur supabase.com (région Europe, par exemple Paris ou Francfort).
-2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (dans l'ordre des noms : `…_init`, `…_photos` qui crée aussi le stockage des photos, `…_seo`, `…_photos_hd`, `…_photos_ia`, `…_annulation`, `…_photos_nettes_legal`, `…_coordonnees_galerie`, `…_photos_tartiflette_burrata`, `…_photos_4fromages_vege_paysanne`, `…_vitrine_sumup`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
+2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (dans l'ordre des noms : `…_init`, `…_photos` qui crée aussi le stockage des photos, `…_seo`, `…_photos_hd`, `…_photos_ia`, `…_annulation`, `…_photos_nettes_legal`, `…_coordonnees_galerie`, `…_photos_tartiflette_burrata`, `…_photos_4fromages_vege_paysanne`, `…_horaires_nuit_instagram`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
    Avec la CLI, c'est équivalent à : `npx supabase link --project-ref <ref>` puis `npm run db:push`, et le seed dans le SQL Editor.
-3. Dans **Authentication > Sign In / Providers**, **désactivez les inscriptions** (« Allow new users to sign up ») : le site n'a pas de comptes.
+3. Dans **Authentication > Sign In / Providers**, **désactivez les inscriptions** (« Allow new users to sign up »). Seul le compte que vous créez pour le restaurant doit exister.
 
 **Option B : Supabase en local (nécessite Docker)**
 
@@ -73,13 +63,24 @@ cp .env.example .env.local
 
 | Variable | Où elle sert | Secrète ? |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | lecture de la carte et des réglages | non |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | idem (clé « anon » ou « publishable ») | non |
+| `NEXT_PUBLIC_SUPABASE_URL` | navigateur + serveur | non |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | navigateur + serveur (clé « anon » ou « publishable ») | non |
 | `NEXT_PUBLIC_SITE_URL` | adresse publique du site, ex. `https://www.mondomaine.fr` (balises canoniques, sitemap, Google) | non |
+| `SUPABASE_SERVICE_ROLE_KEY` | **serveur uniquement** (création des commandes) — clé « service_role » ou « secret » | **oui** |
 
-Il n'y a plus de clé secrète : le site ne fait que lire.
+### 4. Créer le compte du restaurant
 
-### 4. Lancer
+1. **Authentication > Users > Add user** : e-mail + mot de passe solide, cochez « Auto confirm user ».
+2. Dans le **SQL Editor** :
+
+```sql
+insert into public.staff (user_id, role)
+select id, 'admin' from auth.users where email = 'adresse@du-restaurant.fr';
+```
+
+Un compte Supabase qui n'est pas dans `staff` ne peut **pas** ouvrir `/pizzeria`, même connecté.
+
+### 5. Lancer
 
 ```bash
 npm run dev     # http://localhost:3000
@@ -104,8 +105,8 @@ npm run dev     # http://localhost:3000
 ## Déploiement sur Vercel
 
 1. Poussez le projet sur GitHub, puis importez-le dans Vercel (framework détecté automatiquement).
-2. Ajoutez les trois variables d'environnement dans **Settings > Environment Variables**.
-3. Si une ancienne variable `SUPABASE_SERVICE_ROLE_KEY` existe dans Vercel, supprimez-la : elle ne sert plus.
+2. Ajoutez les quatre variables d'environnement dans **Settings > Environment Variables**. `SUPABASE_SERVICE_ROLE_KEY` ne doit jamais être préfixée par `NEXT_PUBLIC_`.
+3. Dans Supabase, **Authentication > URL Configuration**, mettez l'URL Vercel comme « Site URL ».
 
 ---
 
@@ -114,31 +115,38 @@ npm run dev     # http://localhost:3000
 ```
 src/
   app/
-    page.tsx               /            bandeau + carte + galerie + infos pratiques
-    commander/page.tsx     /commander   redirection vers la commande SumUp
+    page.tsx               /                bandeau + carte + panier + galerie + infos pratiques
+    commander/             /commander       formulaire ; actions.ts = action serveur submitOrder
+    commande/[token]/      suivi et annulation par le client
+    login/                 connexion du restaurant
+    pizzeria/              page des commandes (temps réel, alerte sonore, ruptures)
     mentions-legales/      confidentialite/
-    globals.css            CSS de la maquette
-  components/
-    OrderButton.tsx        bouton « Commander » (lien SumUp, sinon appel)
-    Header, Hero, NeonChef, Menu (carte à onglets), ProductImage, PhotoPlaceholder,
-    PizzeriaGallery, MapEmbed, Lightbox, PracticalInfo, LegalField
+  components/              Header, Hero, Shop (carte + panier), cart-store, my-order, ProductImage,
+                           PizzeriaGallery, MapEmbed, Lightbox, PracticalInfo, LegalField
   lib/
-    data.ts                lecture de la carte, des photos et des réglages (clé publique)
-    time.ts                ouvert / fermé, fuseau Europe/Paris, plages de nuit
-    structured-data.ts     Schema.org Restaurant + Menu
-    legal.ts               informations des mentions légales
+    orders/                validation serveur, création, suivi, messages d'erreur
+    time.ts                horaires, créneaux, ouvert / fermé, fuseau Europe/Paris, plages de nuit
+    supabase/admin.ts      clé service — "server-only", jamais dans le navigateur
+    supabase/server.ts     client lié à la session (cookies)
+    supabase/browser.ts    client navigateur (clé publique, temps réel)
+  proxy.ts                 rafraîchit la session, redirige /pizzeria sans session vers /login
 supabase/
   migrations/              historique complet du schéma
   seed.sql                 carte, suppléments, réglages, photos
-public/photos/carte/       photos de la carte (1200 × 900)
 ```
 
 ### Sécurité
 
-- Le site ne collecte **aucune donnée personnelle** : pas de compte, pas de formulaire, pas de cookie, rien dans le navigateur.
-- La base n'est lisible par le public qu'en lecture (RLS) : carte, suppléments, réglages, photos publiées. Aucune écriture possible avec la clé publique.
-- En-têtes : HTTPS forcé (HSTS), interdiction d'intégrer le site dans une autre page, pas d'accès caméra / micro / position, `nosniff`, politique de référent.
-- La carte Google Maps ne se charge qu'après un clic.
+| Qui | Peut | Ne peut pas |
+| --- | --- | --- |
+| **Client** (anonyme) | lire la carte ; créer une commande via l'action serveur ; suivre et annuler **sa** commande avec son lien secret | lire ou modifier les commandes ; appeler `create_order()` directement |
+| **Restaurant** (compte dans `staff`) | lire les commandes ; changer leur statut ; gérer les ruptures ; mettre les commandes en ligne en pause | modifier prix, totaux ou contenu des commandes |
+
+- RLS sur toutes les tables ; `orders`, `order_items`, `order_counters` fermées à la clé publique.
+- Prix et total recalculés en base ; validation serveur ; anti-abus (champ piège, 3 commandes maximum par téléphone en 15 minutes).
+- `payment_status` reste `pending` (« À encaisser ») : la création d'une commande ne la rend jamais « payée ».
+- En-têtes : HTTPS forcé (HSTS), pas d'intégration dans une autre page, pas d'accès caméra / micro / position.
+- Les commandes de plus de 12 mois sont supprimées chaque nuit (`purge_old_orders`, pg_cron).
 
 ### Horaires
 
@@ -156,7 +164,7 @@ Ils sont dans **Table Editor > restaurant_settings**, colonne JSON `opening_hour
 {"monday": [], "tuesday": [{"open": "11:00", "close": "15:00"}, {"open": "18:00", "close": "23:30"}], …, "sunday": [{"open": "18:00", "close": "02:00"}]}
 ```
 
-Une plage dont l'heure de fermeture est **plus tôt** que l'heure d'ouverture se termine **le lendemain** (dimanche 18:00 → lundi 02:00). Une plage de nuit doit finir au plus tard à 6 h. Le bandeau affiche « Ouvert jusqu'à … » ou « Fermé · ouvre … à … » en heure de Paris. Les mêmes horaires sont publiés pour Google (données structurées) : ils doivent être identiques à la fiche Google Business Profile, qui affichait le 14/10/2026 des horaires différents (lundi 9 h–minuit, mardi minuit–17 h…). Pensez à la corriger.
+Une plage dont l'heure de fermeture est **plus tôt** que l'heure d'ouverture se termine **le lendemain** (dimanche 18:00 → lundi 02:00). Une plage de nuit doit finir au plus tard à 6 h : la **journée de service** se termine à 6 h, donc une commande passée à 1 h dans la nuit de dimanche reste sur le tableau du dimanche, avec la suite des numéros. On commande pendant les heures d'ouverture ; les créneaux de retrait sont proposés toutes les 10 minutes, au moins 20 minutes plus tard (`slot_interval_minutes`, `min_prep_minutes`). Le bandeau affiche « Ouvert jusqu'à … » ou « Fermé · ouvre … à … » en heure de Paris. Les mêmes horaires sont publiés pour Google (données structurées) : ils doivent être identiques à la fiche Google Business Profile, qui affichait le 14/10/2026 des horaires différents (lundi 9 h–minuit, mardi minuit–17 h…). Pensez à la corriger.
 
 ### Découvrez notre pizzeria et carte
 
@@ -170,7 +178,7 @@ La section présente la pizzeria en quelques lignes, affiche la première photo 
 - Photos d'illustration IA (Canva), même fond que les vraies : Margherita, Milano, Reine, Boursalino, 4 Saisons, Mexicaine, Chicken, Tartiflette, Burrata, 4 Fromages, Végétarienne, Paysanne.
 - Sans photo : 5 Fromages, Chèvre Miel.
 
-**Changer une photo** (sans espace d'administration, tout se fait dans Supabase) :
+**Changer une photo** (dans Supabase, la page des commandes ne gère pas les photos) :
 
 1. **Storage > photos** : envoyez l'image (JPEG, PNG ou WebP, 5 Mo maximum) dans le dossier `products/` (ou `gallery/`). Retirez d'abord les métadonnées GPS d'une photo de téléphone (une capture d'écran de la photo suffit).
 2. **SQL Editor** :
@@ -187,14 +195,15 @@ where name = 'La Reine';
 
 - **Page indexée** : l'accueil `/`, qui contient la carte complète, la galerie et les infos pratiques. Titre « Pizza Milano · Pizzeria à emporter à Saint-Brieuc », description, canonique, image de partage `public/og.jpg`.
 - **`/sitemap.xml` et `/robots.txt`** générés à partir de `NEXT_PUBLIC_SITE_URL`.
-- **Données structurées** `Restaurant` + `Menu` construites uniquement à partir de la base : adresse, téléphone, GPS, lien Maps, horaires, Instagram (`sameAs`) et, si le lien SumUp est renseigné, l'action « Commander » (`OrderAction`, retrait sur place).
+- **Données structurées** `Restaurant` + `Menu` construites uniquement à partir de la base : adresse, téléphone, GPS, lien Maps, horaires, Instagram (`sameAs`).
+- `/commander`, `/commande/…`, `/login` et `/pizzeria` sont en `noindex`.
 - **Vérifier après déploiement** : `/robots.txt`, `/sitemap.xml`, le [test des résultats enrichis](https://search.google.com/test/rich-results) et [PageSpeed Insights](https://pagespeed.web.dev/).
 
 ---
 
 ## Légal
 
-**Pages** : `/mentions-legales` (éditeur, hébergeur, propriété intellectuelle, conditions de commande) et `/confidentialite`. Elles sont liées en bas de chaque page. Les conditions précisent que la commande en ligne et le paiement se font sur la page SumUp, avec ses propres conditions.
+**Pages** : `/mentions-legales` (éditeur, hébergeur, propriété intellectuelle, conditions de commande) et `/confidentialite`. Elles sont liées en bas de chaque page. Les conditions précisent que le paiement se fait au comptoir, au retrait.
 
 **Rempli** (registre des entreprises, 14/10/2026, à confirmer par le gérant) : SAS MILANO PIZZA 22, enseigne « Pizza Milano », 3 rue du Maréchal Foch, 22000 Saint-Brieuc, SIRET 995 087 970 00019, RCS Saint-Brieuc 995 087 970, directeur de la publication Mohamed Lamine Sekine (président).
 
@@ -215,8 +224,8 @@ where name = 'La Reine';
 ## À confirmer avec le restaurant
 
 **Commande en ligne**
-- [ ] Lien de la page de commande SumUp (Order & Pay), à mettre dans `order_url`.
-- [ ] Carte SumUp identique à celle du site (voir plus haut : Hawaï à 2,00 €, Indienne, La Poulet présentes sur la caisse).
+- [ ] Délai minimum de préparation (20 min) et pas des créneaux (10 min).
+- [ ] Carte de la caisse SumUp : on y voit « Hawaï » à 2,00 €, « Indienne » et « La Poulet », absentes du site. Pour encaisser au bon prix, la caisse et le site doivent avoir les mêmes produits et prix.
 
 **Coordonnées**
 - [x] Adresse et téléphone : **3 rue du Maréchal Foch, 22000 Saint-Brieuc, 06 50 64 73 89** (fiche Google Maps, 14/10/2026).
@@ -241,5 +250,7 @@ where name = 'La Reine';
 
 ## Limites connues
 
-- Le site ne voit pas l'état des commandes SumUp (rupture, attente) : la caisse s'en charge. Pour marquer un produit épuisé sur la carte du site, passez `available` à `false` dans **Table Editor > products**.
-- Le badge « Ouvert / Fermé » suit les horaires enregistrés, pas les fermetures exceptionnelles : pour une fermeture exceptionnelle, publiez-la sur Instagram ou passez temporairement les horaires du jour à `[]`.
+- Seuls les numéros français (fixe ou mobile) sont acceptés.
+- Le son de la page des commandes doit être réactivé (un clic) à chaque ouverture de la page.
+- Les commandes sur place ou par téléphone ne passent pas par le site : elles se saisissent dans la caisse comme avant.
+- Le badge « Ouvert / Fermé » suit les horaires enregistrés, pas les fermetures exceptionnelles : utilisez le bouton « Commandes en ligne : en pause » de la page des commandes.

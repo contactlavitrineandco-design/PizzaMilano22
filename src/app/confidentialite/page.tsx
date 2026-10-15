@@ -9,13 +9,14 @@ import { DEFAULT_CITY } from "@/lib/site";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Politique de confidentialité",
-  description: "Données personnelles et site Pizza Milano : ce qui est collecté (presque rien), commandes via SumUp, cookies et vos droits.",
+  description: "Quelles données Pizza Milano collecte lors d'une commande en ligne, pourquoi, combien de temps, et vos droits.",
   alternates: { canonical: "/confidentialite" },
 };
 
 export default async function Confidentialite() {
   const s = await getSettings();
   const e = LEGAL.editeur;
+  const months = LEGAL.conservationCommandesMois;
   return (
     <>
       <main className="wrap legal">
@@ -23,8 +24,9 @@ export default async function Confidentialite() {
         <p className="legal-date">Dernière mise à jour : {LEGAL.miseAJour}</p>
 
         <p>
-          En résumé : le site Pizza Milano présente la carte et ne vous demande aucune donnée personnelle. Pas de compte, pas
-          de formulaire, pas de cookie publicitaire ni de mesure d&apos;audience.
+          En résumé : nous demandons seulement ce qu&apos;il faut pour préparer votre commande (prénom, téléphone, heure de
+          retrait). Rien n&apos;est vendu, rien n&apos;est utilisé pour de la publicité, et vos commandes sont supprimées
+          automatiquement au bout de {months} mois.
         </p>
 
         <h2>Responsable du traitement</h2>
@@ -33,44 +35,71 @@ export default async function Confidentialite() {
           <LegalField value={e.email} label="adresse e-mail" />.
         </p>
 
-        <h2>Commandes en ligne</h2>
+        <h2>Données collectées et utilisation</h2>
+        <div className="legal-table">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Données</th>
+                <th scope="col">Pourquoi</th>
+                <th scope="col">Base légale</th>
+                <th scope="col">Durée</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Prénom, téléphone, produits commandés, heure de retrait, remarque</td>
+                <td>Préparer et vous remettre la commande, vous appeler en cas de problème</td>
+                <td>Exécution de la commande (art. 6.1.b du RGPD)</td>
+                <td>{months} mois, puis suppression automatique</td>
+              </tr>
+              <tr>
+                <td>Téléphone et nombre de commandes récentes</td>
+                <td>Empêcher les commandes abusives (3 commandes maximum en 15 minutes)</td>
+                <td>Intérêt légitime (art. 6.1.f)</td>
+                <td>Même durée que la commande</td>
+              </tr>
+              <tr>
+                <td>Adresse e-mail des comptes du personnel</td>
+                <td>Accès sécurisé à l&apos;espace pizzeria</td>
+                <td>Intérêt légitime</td>
+                <td>Jusqu&apos;à la suppression du compte</td>
+              </tr>
+              <tr>
+                <td>Données techniques de connexion (adresse IP, navigateur)</td>
+                <td>Sécurité et bon fonctionnement du site, chez l&apos;hébergeur</td>
+                <td>Intérêt légitime</td>
+                <td>Selon la politique de l&apos;hébergeur</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Aucune donnée bancaire n&apos;est collectée : le paiement se fait au comptoir.</p>
+
+        <h2>Destinataires</h2>
         <p>
-          Le bouton « Commander en ligne » ouvre la page de commande de SumUp, prestataire de caisse et de paiement du
-          restaurant. Les informations que vous y saisissez (prénom, téléphone, commande, paiement) sont traitées par SumUp
-          pour notre compte et transmises à notre caisse, afin de préparer votre commande et d&apos;encaisser le paiement.
-          SumUp présente sa protection des données sur sa{" "}
-          <a
-            href="https://help.sumup.com/fr-FR/articles/2MrnASQDdzJMkFMUnK7BFL-rgpd-protection-des-donnees"
-            rel="noopener"
-            target="_blank"
-          >
-            page RGPD
-          </a>
-          . Les ventes sont conservées par le restaurant pendant la durée exigée pour sa comptabilité.
+          Seul le personnel de {s.restaurant_name} voit vos commandes. Deux prestataires techniques les hébergent pour notre
+          compte : {LEGAL.hebergeur.nom} (hébergement du site, États-Unis) et {LEGAL.baseDeDonnees.nom} (base de données,
+          région <LegalField value={LEGAL.baseDeDonnees.region} label="région du projet Supabase" />). Les transferts
+          éventuels hors de l&apos;Union européenne sont encadrés par les garanties prévues par ces prestataires (clauses
+          contractuelles types de la Commission européenne). Vos données ne sont ni vendues ni partagées à des fins
+          publicitaires.
         </p>
 
-        <h2>Données techniques</h2>
+        <h2>Cookies et stockage dans votre navigateur</h2>
         <p>
-          Comme tout site, l&apos;hébergeur {LEGAL.hebergeur.nom} (États-Unis) reçoit des données techniques de connexion
-          (adresse IP, navigateur) pour assurer la sécurité et le bon fonctionnement du site, sur la base de notre intérêt
-          légitime et selon sa propre politique de conservation. Les transferts hors de l&apos;Union européenne sont encadrés
-          par les clauses contractuelles types de la Commission européenne. La carte, les photos et les réglages du site sont
-          hébergés par {LEGAL.baseDeDonnees.nom} et ne contiennent aucune donnée personnelle de visiteur.
-        </p>
-
-        <h2>Cookies</h2>
-        <p>
-          Le site ne dépose aucun cookie et n&apos;enregistre rien dans votre navigateur. Les polices de caractères sont
-          hébergées par le site lui-même. La carte Google Maps n&apos;est chargée que si vous cliquez sur « Afficher la
-          carte » : Google peut alors déposer ses propres cookies, selon sa politique de confidentialité. Le lien Instagram et
-          la page de commande SumUp s&apos;ouvrent sur leurs sites, avec leurs propres règles.
+          Le site n&apos;utilise ni cookie publicitaire ni outil de mesure d&apos;audience. Il enregistre dans votre
+          navigateur votre panier et le numéro de votre dernière commande, pour que vous puissiez les retrouver. Ces
+          informations sont strictement nécessaires au service demandé et ne nécessitent donc pas de consentement. Un cookie de
+          connexion est utilisé uniquement dans l&apos;espace réservé au personnel. Les polices de caractères sont hébergées
+          par le site lui-même. La carte Google Maps n&apos;est chargée que si vous cliquez sur « Afficher la carte » :
+          Google peut alors déposer ses propres cookies, selon sa politique de confidentialité.
         </p>
 
         <h2>Sécurité</h2>
         <p>
-          Connexion chiffrée (HTTPS) et en-têtes de sécurité. Le site n&apos;a ni espace de connexion ni base de commandes :
-          il n&apos;y a pas de données de clients à protéger chez nous. La base de données n&apos;est lisible qu&apos;en
-          lecture seule par le public (carte, photos, horaires).
+          Connexion chiffrée (HTTPS), accès aux commandes réservé aux comptes du personnel, prix et totaux recalculés par le
+          serveur, base de données protégée par des règles d&apos;accès strictes.
         </p>
 
         <h2>Vos droits</h2>
@@ -89,7 +118,7 @@ export default async function Confidentialite() {
           Voir aussi les <Link href="/mentions-legales">mentions légales et conditions de commande</Link>.
         </p>
       </main>
-      <PracticalInfo settings={s} city={s.city ?? DEFAULT_CITY} pizzaFrom={null} />
+      <PracticalInfo settings={s} city={s.city ?? DEFAULT_CITY} pizzaFrom={null} showOrderLink />
     </>
   );
 }

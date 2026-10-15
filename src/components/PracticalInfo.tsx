@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { eur } from "@/lib/format";
 import { frHour, WEEKDAYS } from "@/lib/time";
-import { OrderButton, telHref } from "./OrderButton";
 import type { RestaurantSettings, Weekday } from "@/lib/types";
 
 const DAY_NAMES: Record<Weekday, string> = {
@@ -23,10 +22,12 @@ export function PracticalInfo({
   settings,
   city,
   pizzaFrom,
+  showOrderLink,
 }: {
   settings: RestaurantSettings;
   city: string;
   pizzaFrom: number | null;
+  showOrderLink: boolean;
 }) {
   const hasAddress = settings.address && settings.postal_code && settings.city;
   const showHours = !settings.opening_hours_provisional;
@@ -37,12 +38,14 @@ export function PracticalInfo({
           <h2 id="infos-h">Pizza Milano, pizzeria à emporter à {city}</h2>
           <p>
             Pizzas sur base tomate ou crème{pizzaFrom !== null ? ` dès ${eur(pizzaFrom)}` : ""}, soufflés garnis servis
-            avec des frites et boissons fraîches.{" "}
-            {settings.order_url
-              ? "Commandez en ligne, choisissez votre heure de retrait et passez récupérer votre commande."
-              : "Commandez par téléphone ou directement au comptoir."}
+            avec des frites et boissons fraîches. Commandez en ligne, choisissez votre heure de retrait, puis récupérez et
+            réglez votre commande au comptoir.
           </p>
-          <OrderButton settings={settings} className="ghost foot-cta" />
+          {showOrderLink && (
+            <Link className="ghost foot-cta" href="/commander">
+              Commander en ligne
+            </Link>
+          )}
         </div>
 
         {(hasAddress || settings.phone || settings.instagram_url) && (
@@ -61,7 +64,7 @@ export function PracticalInfo({
               {settings.phone && (
                 <>
                   <br />
-                  <a href={telHref(settings.phone)}>{settings.phone}</a>
+                  <a href={`tel:+33${settings.phone.replace(/\s/g, "").slice(1)}`}>{settings.phone}</a>
                 </>
               )}
             </address>
@@ -104,6 +107,7 @@ export function PracticalInfo({
         <Link href="/mentions-legales">Mentions légales</Link>
         <Link href="/mentions-legales#conditions">Conditions de commande</Link>
         <Link href="/confidentialite">Confidentialité</Link>
+        <Link href="/pizzeria">Espace restaurant</Link>
       </div>
     </footer>
   );

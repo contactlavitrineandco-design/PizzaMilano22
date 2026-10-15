@@ -1,8 +1,11 @@
-import Link from "next/link";
-import type { RestaurantSettings } from "@/lib/types";
-import { OrderButton } from "./OrderButton";
+"use client";
 
-export function Header({ settings }: { settings: Pick<RestaurantSettings, "order_url" | "phone"> | null }) {
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+export function Header() {
+  const pathname = usePathname();
+  const pro = pathname.startsWith("/pizzeria") || pathname.startsWith("/login");
   return (
     <header className="top">
       <div className="wrap">
@@ -16,10 +19,18 @@ export function Header({ settings }: { settings: Pick<RestaurantSettings, "order
             Pizza Milano<small>Pizzeria · À emporter</small>
           </span>
         </Link>
-        <nav className="top-nav" aria-label="Navigation principale">
-          <Link href="/#carte">La carte</Link>
-          {settings && <OrderButton settings={settings} className="top-cta" label="Commander" />}
-        </nav>
+        {pro ? (
+          <nav className="top-nav" aria-label="Navigation">
+            <Link href="/">Voir le site</Link>
+          </nav>
+        ) : (
+          <nav className="top-nav" aria-label="Navigation principale">
+            <Link href="/#carte">La carte</Link>
+            <Link href="/commander#carte" className="top-cta">
+              Commander
+            </Link>
+          </nav>
+        )}
       </div>
     </header>
   );

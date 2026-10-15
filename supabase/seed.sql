@@ -39,10 +39,6 @@ update public.restaurant_settings set
   instagram_url = coalesce(instagram_url, 'https://www.instagram.com/milanopizza22/')
 where id = 1;
 
--- Lien de la page de commande SumUp (Order & Pay), à renseigner quand le
--- restaurant l'a activée dans son compte SumUp. Tant qu'il est vide, le
--- bouton « Commander » propose d'appeler la pizzeria.
--- update public.restaurant_settings set order_url = 'https://…' where id = 1;
 
 -- ---------------------------------------------------------------------
 -- Suppléments (menu : « Supplément : Œufs, Fromage 0,50 €, Viande 1 € »,
@@ -139,3 +135,11 @@ select 'pizzas', '/photos/carte/neptune.webp',
        'Pizza Neptune du restaurant : thon, poivrons, oignons rouges et olives noires, devant le mur en lattes de bois',
        'Tout juste sortie du four', 'restaurant', 10
 where not exists (select 1 from public.gallery_photos where image_path = '/photos/carte/neptune.webp');
+
+-- ---------------------------------------------------------------------
+-- Compte du restaurant pour la page des commandes (/pizzeria) : à faire une
+-- fois le compte créé dans Supabase > Authentication > Users (voir README) :
+--
+-- insert into public.staff (user_id, role)
+-- select id, 'admin' from auth.users where email = 'prenom@exemple.fr';
+-- ---------------------------------------------------------------------

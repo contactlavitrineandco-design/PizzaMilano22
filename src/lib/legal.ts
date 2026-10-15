@@ -47,5 +47,7 @@ export const LEGAL = {
     region: null as string | null,
   },
   /** Date de dernière mise à jour des pages légales */
+  /** Durée de conservation des commandes, en mois (suppression automatique, voir migration …_photos_nettes_legal). */
+  conservationCommandesMois: 12,
   miseAJour: "15 octobre 2026",
 };
