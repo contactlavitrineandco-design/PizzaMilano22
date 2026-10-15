@@ -348,3 +348,78 @@ main:has(+ .site-foot) .shop{padding-bottom:12px}
 .map-consent small a{color:var(--ink-2)}
 .map-consent .cta{padding:12px 22px}
 @media (max-width:720px){.about{grid-template-columns:1fr}.map-box{aspect-ratio:4/3}}
+
+/* ---------- historique des commandes (espace restaurateur) ---------- */
+.hist .stats{margin-bottom:12px}
+.hist-filters{background:var(--counter-2);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:14px}
+.hist-presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.hist-presets .chip{text-decoration:none;min-height:36px;display:inline-flex;align-items:center}
+.hist-presets .chip.on{background:var(--ink);color:var(--counter);border-color:var(--ink)}
+.hist-form{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.hist-form label,.hist-vat label{display:grid;gap:4px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.hist-form .grow{flex:1 1 220px}
+.hist-form input,.hist-form select,.hist-vat select,.mfa-code input{font:inherit;font-size:15px;letter-spacing:0;text-transform:none;color:var(--ink);background:var(--counter);border:1px solid var(--line);border-radius:8px;padding:9px 10px;min-height:44px;color-scheme:dark}
+.hist-form .add{min-height:44px;padding-inline:18px}
+.hist-range{margin:10px 0 0;color:var(--ink-3);font-size:13px}.hist-range b{color:var(--ink-2)}
+.hist-warn{background:color-mix(in srgb,var(--warn) 14%,var(--counter-2));border:1px solid color-mix(in srgb,var(--warn) 45%,var(--line));color:#f3cf8f;border-radius:var(--r);padding:10px 14px;margin:0 0 14px;font-size:14px}
+.hist-warn a{color:var(--ink);font-weight:700}
+.hist-card{background:var(--counter-2);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:14px;min-width:0}
+.hist-card-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.hist-card h2{font-family:var(--display);font-size:22px;margin:0}
+.hist-card h2 small{font-family:var(--mono);font-size:14px;color:var(--ink-3);font-weight:400}
+.hist-card p{margin:0 0 10px}
+.hist-export{display:flex;flex-wrap:wrap;gap:8px}
+.hist-export .ghost{font-size:14px}
+.hist-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:8px}
+.hist-scroll.tall{max-height:520px;overflow-y:auto}
+.hist-table{width:100%;border-collapse:collapse;font-size:14px}
+.hist-table th,.hist-table td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.hist-table thead th{position:sticky;top:0;background:var(--counter-3);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-3);font-weight:600;white-space:nowrap}
+.hist-table tbody th{font-weight:600}
+.hist-table tbody tr:last-child>*{border-bottom:0}
+.hist-table tfoot>tr>*{border-top:2px solid var(--line);border-bottom:0;font-weight:700}
+.hist-table .r{text-align:right}
+.hist-table .b{font-weight:700}
+.hist-table .warn{color:var(--warn);font-weight:700}
+.hist-table small{display:block;color:var(--ink-3);font-size:12px}
+.hist-table .nowrap{white-space:nowrap}
+.hist-orders tr.off td{color:var(--ink-3)}
+.hist-items{min-width:220px;color:var(--ink-2)}
+.hist-anon{color:var(--ink-3)}
+.hist-sort{color:inherit;text-decoration:none}
+.hist-sort.on{color:var(--ink)}
+.hist-status{display:inline-block;font-weight:600;white-space:nowrap}
+.hist-status::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--ink-3);vertical-align:1px}
+.s-done::before{background:var(--ok)}.s-cancelled::before{background:var(--hot)}
+.s-new::before,.s-prep::before,.s-ready::before{background:var(--warn)}
+.hist-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.hist-btn{border:1px solid var(--line);background:var(--counter-3);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;min-height:36px}
+.hist-btn.ok{background:var(--ok);border-color:var(--ok);color:#06200f}
+.hist-err{color:#ff9c95;font-size:13px;margin:6px 0 0}
+.hist-cats{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:0 0 12px;padding:0}
+.hist-cats li{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:grid}
+.hist-cats span{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.hist-cats b{font-family:var(--mono);font-size:20px}
+.hist-cats small{color:var(--ink-2)}
+.hist-pages{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;color:var(--ink-3);font-size:14px}
+.hist-details{margin:12px 0 4px}
+.hist-details summary{cursor:pointer;font-weight:600;min-height:32px}
+.hist-note{color:var(--ink-3);font-size:13px;margin:8px 0}
+.hist-vat{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.hist-vat .ghost{min-height:44px}
+.hist-vat .hist-note{flex-basis:100%;margin:0}
+.hist-list{margin:0 0 10px;padding-left:18px;color:var(--ink-2);font-size:14px;display:grid;gap:4px}
+.hist-sub{font-family:var(--display);font-size:18px;margin:6px 0 6px}
+.hist-empty{color:var(--ink-3);font-size:14px}
+.hist .switch{gap:0}
+.hist .switch a.on{background:var(--ink);color:var(--counter)}
+.mfa .hist-card{max-width:620px}
+.mfa-card h2{margin-bottom:8px}
+.mfa-card .add{min-height:44px;padding-inline:18px}
+.mfa-steps{margin:0 0 12px;padding-left:20px;color:var(--ink-2);display:grid;gap:6px}
+.mfa-qr{display:block;width:200px;height:200px;background:#fff;border-radius:8px;padding:8px;margin:4px 0 10px}
+.mfa-secret{font-family:var(--mono);color:var(--ink);word-break:break-all;background:var(--counter);padding:2px 6px;border-radius:4px}
+.mfa-code{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-top:10px}
+.mfa-code label{display:grid;gap:4px;font-weight:600;font-size:14px}
+.mfa-code input{font-family:var(--mono);font-size:22px;letter-spacing:6px;width:10ch;text-align:center}
+@media (max-width:720px){.hist .stats{grid-template-columns:repeat(2,minmax(0,1fr))}.hist-form label:not(.grow){flex:1 1 140px}}

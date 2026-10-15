@@ -58,6 +58,21 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // Espace restaurateur : jamais mis en cache (navigateur, proxy, CDN), jamais indexé.
+        source: "/pizzeria/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store, private" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      },
+      {
+        source: "/login",
+        headers: [
+          { key: "Cache-Control", value: "no-store, private" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      },
     ];
   },
 };

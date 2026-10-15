@@ -25,8 +25,8 @@ export default async function Confidentialite() {
 
         <p>
           En résumé : nous demandons seulement ce qu&apos;il faut pour préparer votre commande (prénom, téléphone, heure de
-          retrait). Rien n&apos;est vendu, rien n&apos;est utilisé pour de la publicité, et vos commandes sont supprimées
-          automatiquement au bout de {months} mois.
+          retrait). Rien n&apos;est vendu, rien n&apos;est utilisé pour de la publicité, et votre prénom et votre
+          téléphone sont effacés automatiquement au bout de {months} mois.
         </p>
 
         <h2>Responsable du traitement</h2>
@@ -48,10 +48,16 @@ export default async function Confidentialite() {
             </thead>
             <tbody>
               <tr>
-                <td>Prénom, téléphone, produits commandés, heure de retrait, remarque</td>
+                <td>Prénom, téléphone, remarque</td>
                 <td>Préparer et vous remettre la commande, vous appeler en cas de problème</td>
                 <td>Exécution de la commande (art. 6.1.b du RGPD)</td>
-                <td>{months} mois, puis suppression automatique</td>
+                <td>{months} mois, puis effacement automatique</td>
+              </tr>
+              <tr>
+                <td>Produits commandés, montants, date et heure (sans nom ni téléphone)</td>
+                <td>Comptabilité et déclarations du restaurant</td>
+                <td>Obligation légale (art. 6.1.c du RGPD ; art. L123-22 du Code de commerce)</td>
+                <td>10 ans, puis suppression automatique</td>
               </tr>
               <tr>
                 <td>Téléphone et nombre de commandes récentes</td>
@@ -99,7 +105,10 @@ export default async function Confidentialite() {
         <h2>Sécurité</h2>
         <p>
           Connexion chiffrée (HTTPS), accès aux commandes réservé aux comptes du personnel, prix et totaux recalculés par le
-          serveur, base de données protégée par des règles d&apos;accès strictes.
+          serveur, base de données protégée par des règles d&apos;accès strictes. Le personnel ne voit que les commandes
+          de la veille et du jour ; l&apos;historique complet n&apos;est accessible qu&apos;au responsable, avec un mot
+          de passe et un code à 6 chiffres affiché par son téléphone (double authentification). Les numéros de téléphone
+          y sont masqués et les exports comptables ne contiennent ni nom ni téléphone.
         </p>
 
         <h2>Vos droits</h2>

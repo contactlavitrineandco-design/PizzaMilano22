@@ -34,7 +34,7 @@ npm install
 **Option A : projet Supabase en ligne (le plus simple)**
 
 1. Créez un projet sur supabase.com (région Europe, par exemple Paris ou Francfort).
-2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (dans l'ordre des noms : `…_init`, `…_photos` qui crée aussi le stockage des photos, `…_seo`, `…_photos_hd`, `…_photos_ia`, `…_annulation`, `…_photos_nettes_legal`, `…_coordonnees_galerie`, `…_photos_tartiflette_burrata`, `…_photos_4fromages_vege_paysanne`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
+2. Dans **SQL Editor**, exécutez dans l'ordre les fichiers de `supabase/migrations/` (dans l'ordre des noms : `…_init`, `…_photos` qui crée aussi le stockage des photos, `…_seo`, `…_photos_hd`, `…_photos_ia`, `…_annulation`, `…_photos_nettes_legal`, `…_coordonnees_galerie`, `…_photos_tartiflette_burrata`, `…_photos_4fromages_vege_paysanne`, `…_historique`), puis `supabase/seed.sql`. Sur une base déjà en place, n'exécutez que les migrations que vous n'avez pas encore lancées.
    Avec la CLI, c'est équivalent à : `npx supabase link --project-ref <ref>` puis `npm run db:push`, et le seed dans le SQL Editor.
 3. Dans **Authentication > Sign In / Providers**, **désactivez les inscriptions** (« Allow new users to sign up »). Seuls les comptes que vous créez vous-même doivent exister.
 
@@ -165,13 +165,30 @@ La table `order_counters` contient une ligne par jour (heure de Paris). `create_
 | Qui | Peut | Ne peut pas |
 | --- | ---- | ----------- |
 | **Client** (anonyme) | lire la carte, les suppléments et les réglages ; créer une commande via l'action serveur | lire, modifier ou supprimer une commande (même la sienne) ; appeler `create_order()` directement |
-| **Personnel** (`staff`) | lire les commandes ; changer leur statut ; gérer les ruptures ; ouvrir ou fermer les commandes en ligne | modifier prix, totaux ou contenu des commandes |
-| **Admin** (`staff.role = 'admin'`) | en plus : gérer produits, suppléments, réglages, personnel et photos | — |
+| **Personnel** (`staff`) | lire les commandes **d'hier et d'aujourd'hui** ; changer leur statut ; gérer les ruptures ; ouvrir ou fermer les commandes en ligne | modifier prix, totaux ou contenu des commandes |
+| **Admin** (`staff.role = 'admin'`) | en plus : gérer produits, suppléments, réglages, personnel et photos | lire l'historique sans double authentification |
+| **Admin + double authentification** (session `aal2`) | en plus : historique complet, récapitulatifs, exports CSV, taux de TVA, clôturer une ancienne commande | lire le téléphone complet d'une ancienne commande ; effacer le journal des exports |
 
 - RLS est activé sur toutes les tables. `orders`, `order_items` et `order_counters` sont fermées à la clé publique.
-- Les actions du personnel passent par des fonctions SQL (`set_order_status`, `set_product_availability`, `set_supplement_availability`, `set_online_orders_open`) qui vérifient `is_staff()` elles-mêmes. Une action serveur Next.js est appelable par n'importe qui, donc c'est la base qui fait foi.
+- Les actions du personnel passent par des fonctions SQL (`set_order_status`, `set_product_availability`, `set_supplement_availability`, `set_online_orders_open`) qui vérifient `is_staff()` elles-mêmes. L'historique passe par `search_orders`, `order_report`, `export_order_lines`, `set_vat_rates` et `log_admin_action`, qui exigent `is_admin_mfa()` (admin **et** jeton `aal2`), en plus de la RLS. Une action serveur Next.js est appelable par n'importe qui, donc c'est la base qui fait foi.
 - `create_order()` n'est exécutable que par le rôle `service_role`, utilisé uniquement dans `src/lib/supabase/admin.ts`. Ce fichier est marqué `server-only` : la compilation échoue s'il est importé côté navigateur.
 - Anti-abus : un champ piège invisible, et au maximum 3 commandes par numéro de téléphone sur 15 minutes.
+
+### Historique des commandes et déclaration
+
+Page `/pizzeria/historique`, lien « Historique » dans l'espace pizzeria (administrateur uniquement).
+
+- **Périodes** : ce mois-ci, mois dernier, trimestre, année, ou dates libres.
+- **Filtres et tri** : statut (récupérées, non clôturées, annulées), recherche par numéro (`#12`), prénom ou produit, tri par date, numéro, client ou montant, 50 commandes par page.
+- **Pour la déclaration** : chiffre d'affaires TTC des commandes **récupérées**, séparé entre plats et boissons. Si les taux de TVA sont renseignés (menu « Taux de TVA », à voir avec le comptable), la page calcule le HT et la TVA. Les commandes restées « Nouvelle / Au four / Prête » les jours précédents ne sont pas comptées : un bandeau les signale et elles peuvent être marquées « Récupérée » ou « Non venue ».
+- **Par jour / par mois**, **ventes par produit**.
+- **Exports CSV** (s'ouvrent dans Excel : séparateur « ; », virgule décimale) : récapitulatif par jour ou par mois, et détail des ventes ligne par ligne. **Aucun nom ni téléphone** dans les exports ; les cellules qui ressemblent à une formule sont neutralisées. Chaque export est inscrit au journal (« Dernières actions »).
+- Ces chiffres ne couvrent que les commandes en ligne : la caisse (SumUp) reste la référence pour les encaissements.
+
+**Double authentification (obligatoire pour l'historique)** : à la première ouverture, la page « Sécurité » affiche un QR code à scanner avec une application d'authentification (Google Authenticator, Microsoft Authenticator, app Mots de passe de l'iPhone). Ensuite, chaque nouvelle connexion demande le code à 6 chiffres avant d'ouvrir l'historique. Le tableau des commandes du jour reste accessible avec le mot de passe seul.
+- Dans Supabase > Authentication > Multi-Factor, vérifier que **TOTP** est activé (c'est le cas par défaut).
+- **Téléphone perdu** : Supabase > Authentication > Users > le compte > supprimer le facteur. Le responsable peut alors associer un nouveau téléphone.
+- Conseillé aussi dans Supabase > Authentication : mot de passe de 12 caractères minimum, protection contre les mots de passe divulgués.
 
 ### Horaires d'ouverture
 
@@ -298,7 +315,7 @@ where id = 1;
 
 **Sécurité en place** : HTTPS forcé (HSTS), en-têtes de protection (pas d'intégration dans une autre page, pas d'accès caméra/micro/position), accès aux commandes réservé au personnel (RLS), prix recalculés côté serveur, jeton secret pour l'annulation, limite anti-abus, clé secrète jamais envoyée au navigateur.
 
-**RGPD** : les commandes de plus de 12 mois sont supprimées chaque nuit par `purge_old_orders()` (planifiée avec pg_cron par la migration `…_photos_nettes_legal`). Vérifier dans Supabase > Database > Extensions que **pg_cron** est activé ; sinon l'activer et relancer le bloc final de cette migration.
+**RGPD et comptabilité** : chaque nuit, `purge_old_orders()` (planifiée avec pg_cron par la migration `…_photos_nettes_legal`, réécrite par `…_historique`) **efface le nom, le téléphone et la remarque** des commandes de plus de 12 mois et remplace leur lien de suivi. Les articles et montants restent **10 ans** (pièces comptables, art. L123-22 du Code de commerce), puis sont supprimés. Le journal des exports est gardé 12 mois. Vérifier dans Supabase > Database > Extensions que **pg_cron** est activé ; sinon l'activer et relancer le bloc final de cette migration.
 
 **À faire relire** : ces textes sont un modèle sérieux, pas un avis juridique. Faites-les relire si possible (CCI des Côtes-d'Armor, expert-comptable).
 

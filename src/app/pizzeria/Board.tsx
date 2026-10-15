@@ -146,9 +146,14 @@ export function Board({ orders, products, supplements, settings, serverNow, isAd
             </button>
           </div>
           {isAdmin && (
-            <Link href="/pizzeria/photos" className="ghost adm-link">
-              Photos
-            </Link>
+            <>
+              <Link href="/pizzeria/historique" className="ghost adm-link">
+                Historique
+              </Link>
+              <Link href="/pizzeria/photos" className="ghost adm-link">
+                Photos
+              </Link>
+            </>
           )}
           <form action={logout}>
             <button type="submit" className="ghost">

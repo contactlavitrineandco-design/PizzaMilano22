@@ -19,6 +19,8 @@ async function callRpc(fn: string, args: Record<string, unknown>): Promise<Actio
   if (!error) return { ok: true };
   if (error.message === "FORBIDDEN") return { ok: false, message: "Session expirée ou accès refusé. Reconnectez-vous." };
   if (error.message === "ORDER_CANCELLED") return { ok: false, message: "Cette commande a été annulée." };
+  if (error.message === "ORDER_ARCHIVED")
+    return { ok: false, message: "Commande archivée (plus de 12 mois) : elle ne peut plus être modifiée." };
   console.error(`[pizzeria] ${fn}`, error);
   return { ok: false, message: "La modification n'a pas été enregistrée. Réessayez." };
 }
