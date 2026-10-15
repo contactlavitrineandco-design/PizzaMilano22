@@ -34,6 +34,7 @@ Le gérant ouvre `https://votre-site/gerant` (lien « Espace gérant » discret 
 - **Code de départ : `220000`.** Un rappel s'affiche tant qu'il n'est pas changé. Changez-le dès la mise en ligne (rubrique « Code d'accès ») : 6 à 12 chiffres, ni chiffres identiques ni chiffres qui se suivent.
 - Ce qu'on peut faire : ouvrir ou mettre en pause les commandes en ligne ; modifier les horaires (2 plages par jour, plage de nuit possible) ; modifier nom, ingrédients, prix, badge de chaque produit, le passer en « Épuisé », en ajouter, en supprimer (un produit déjà commandé ne se supprime pas : passez-le en « Épuisé ») ; changer ou retirer sa photo (prise au téléphone ou choisie, réduite et nettoyée de ses données GPS avant l'envoi) ; prix et disponibilité des suppléments ; téléphone, lien Instagram, délai de préparation ; changer le code.
 - Les changements sont visibles immédiatement sur le site.
+- **Carte pour la caisse SumUp** : le bouton « Télécharger la carte (CSV) » (`/gerant/export-carte`, réservé au gérant connecté) donne un fichier avec, pour chaque produit et supplément : rubrique, nom, prix TTC, description, disponible. Il s'ouvre dans Excel (séparateur « ; », virgule décimale). SumUp importe un catalogue à partir du modèle téléchargé dans le compte SumUp ([aide SumUp : importer des articles](https://help.sumup.com/en-GB/articles/2hsaVR7DMaiO8fEFOnLVfp)) : recopiez les colonnes de ce fichier dans le modèle. Les colonnes exactes du modèle SumUp n'ont pas pu être vérifiées depuis l'environnement de développement.
 
 **Sécurité de l'accès**
 

@@ -79,6 +79,7 @@ export function Gerant({ products, supplements, settings, defaultCode }: Props) 
         <a href="#horaires">Horaires</a>
         <a href="#carte-gerant">Carte et photos</a>
         <a href="#supplements">Suppléments</a>
+        <a href="#sumup">Carte pour SumUp</a>
         <a href="#coordonnees">Coordonnées</a>
         <a href="#code">Code d&apos;accès</a>
       </nav>
@@ -115,6 +116,19 @@ export function Gerant({ products, supplements, settings, defaultCode }: Props) 
             <SupplementRow key={s.id} supplement={s} notify={notify} />
           ))}
         </div>
+      </section>
+
+      {/* ---------- Export pour la caisse SumUp ---------- */}
+      <section className="ger-card" id="sumup" aria-labelledby="h-sumup">
+        <h2 id="h-sumup">Carte pour la caisse SumUp</h2>
+        <p className="ger-hint">
+          Téléchargez la carte du site (rubrique, nom, prix, description, disponibilité, suppléments) pour l&apos;importer dans
+          votre caisse SumUp : la caisse et le site auront les mêmes produits et les mêmes prix. Le fichier s&apos;ouvre dans
+          Excel ; recopiez ses colonnes dans le modèle d&apos;import proposé par votre compte SumUp.
+        </p>
+        <a className="cta ger-save ger-dl" href="/gerant/export-carte" download>
+          Télécharger la carte (CSV)
+        </a>
       </section>
 
       <ContactSection settings={settings} notify={notify} />

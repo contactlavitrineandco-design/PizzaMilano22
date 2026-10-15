@@ -421,3 +421,4 @@ main:has(+ .site-foot) .shop{padding-bottom:12px}
 .ger-file{display:grid;gap:6px;font-weight:600}
 .toast-err{background:#ffb3ad;color:#2a0b08}
 @media (max-width:620px){.ger-product{grid-template-columns:1fr}.ger-photo{max-width:320px}}
+.ger-dl{display:inline-flex;align-items:center;text-decoration:none}
