@@ -41,6 +41,9 @@ export function PracticalInfo({
             avec des frites et boissons fraîches. Commandez en ligne, choisissez votre heure de retrait, puis récupérez et
             réglez votre commande au comptoir.
           </p>
+          <p className="foot-pay">
+            <b>Paiement sur place</b>, au retrait. Rien à payer en ligne.
+          </p>
           {showOrderLink && (
             <Link className="ghost foot-cta" href="/commander">
               Commander en ligne

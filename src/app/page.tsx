@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Hero } from "@/components/Hero";
 import { PizzeriaGallery } from "@/components/PizzeriaGallery";
 import { PracticalInfo } from "@/components/PracticalInfo";
+import { Press } from "@/components/Press";
 import { Shop } from "@/components/Shop";
 import { getGalleryPhotos } from "@/lib/data";
 import { loadShop } from "@/lib/shop-page";
@@ -26,6 +27,7 @@ export default async function HomePage() {
           prices={data.prices}
           status={data.status}
           city={data.city}
+          address={data.settings.address}
           cta={
             data.ordering.canOrder
               ? { href: "/commander#carte", label: "Commander maintenant" }
@@ -34,6 +36,7 @@ export default async function HomePage() {
           showMenuLink={data.ordering.canOrder}
         />
         <Shop products={data.products} supplements={data.supplements} ordering={data.ordering} mode="browse">
+          <Press />
           <PizzeriaGallery photos={gallery} settings={data.settings} />
         </Shop>
       </main>

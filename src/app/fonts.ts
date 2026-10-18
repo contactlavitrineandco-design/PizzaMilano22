@@ -27,3 +27,12 @@ export const jetbrainsMono = localFont({
   preload: false,
   fallback: ["ui-monospace", "Menlo", "monospace"],
 });
+
+/** Nom et médaillon uniquement : sans-serif géométrique grasse, proche du lettrage du logo (OFL). */
+export const jost = localFont({
+  src: "./fonts/jost-latin-wght-normal.woff2",
+  weight: "100 900",
+  variable: "--font-jost",
+  display: "swap",
+  fallback: ["Futura", "Century Gothic", "system-ui", "sans-serif"],
+});

@@ -70,7 +70,7 @@ npm install
 **Option B : Supabase en local (nécessite Docker)**
 
 ```bash
-npx supabase init      # une seule fois, crée supabase/config.toml (garde les migrations existantes)
+# supabase/config.toml est fourni (aucun secret dedans)
 npm run db:start       # démarre Supabase en local et affiche les clés
 npm run db:reset       # applique les migrations et le seed (efface les données locales)
 ```
@@ -115,9 +115,18 @@ npm run dev     # http://localhost:3000
 | `npm run db:reset` | réapplique migrations + seed **en local** |
 | `npm run db:push` | envoie les migrations au projet Supabase lié |
 
+## Déploiement automatique GitHub → Supabase
+
+Le dépôt GitHub contient ce projet dans `Pizza Milano/création de site web/`.
+À chaque envoi sur `main` qui modifie `supabase/migrations/`, le workflow
+`.github/workflows/supabase-base-de-donnees.yml` (à la racine du dépôt)
+applique les nouvelles migrations sur le projet Supabase. Voir le README
+à la racine du dépôt pour les trois réglages à faire une seule fois
+(jeton Supabase, mot de passe de la base, identifiant du projet).
+
 ## Déploiement sur Vercel
 
-1. Poussez le projet sur GitHub, puis importez-le dans Vercel (framework détecté automatiquement).
+1. Importez le dépôt GitHub dans Vercel et réglez **Root Directory** sur `Pizza Milano/création de site web` (framework détecté automatiquement).
 2. Ajoutez les cinq variables d'environnement dans **Settings > Environment Variables**. `SUPABASE_SERVICE_ROLE_KEY` et `ADMIN_SESSION_SECRET` ne doivent jamais être préfixées par `NEXT_PUBLIC_`.
 3. Ouvrez `/gerant`, entrez `220000`, puis choisissez votre propre code.
 
@@ -222,7 +231,20 @@ La section présente la pizzeria en quelques lignes, affiche la première photo 
 
 ---
 
+## Design (18/10/2026) : « le site ressemble à la devanture »
+
+- En-tête : médaillon du logo (`public/brand/`) et nom lettré comme l'enseigne lumineuse (police Jost, OFL), filet tricolore.
+- Bandeau : panneau noir à moulure comme la façade ; « Paiement sur place, au retrait. Rien à payer en ligne. » à côté du bouton Commander, visible sans défiler.
+- « Ils parlent de nous » (`src/components/Press.tsx`, contenu dans `src/lib/press.ts`) : titre, citation courte et nom du journal, sans la photo ni le texte de l'article (droit d'auteur).
+- « Nous trouver » : vraie photo de la devanture (`public/photos/etablissement/devanture.webp`) à côté de la carte, avec « Façade noire, enseigne lumineuse PIZZA MILANO 22 ».
+- Données structurées : `logo`, `image` (devanture) et `alternateName` « Pizza Milano 22 » ; image de partage `public/og.jpg` = devanture.
+
 ## À confirmer avec le restaurant
+
+**Design et presse**
+- [ ] Logo et photo de la devanture : provisoirement recadrés depuis des captures du compte Instagram. Demander les fichiers d'origine et l'accord pour les publier.
+- [ ] Article Ouest-France : renseigner l'adresse exacte (`url`) et la date dans `src/lib/press.ts` ; le lien « Lire l'article » apparaît alors.
+- [ ] Fiche Google : même nom, mêmes horaires que le site, et ajouter la photo de la devanture.
 
 **Commande en ligne**
 - [ ] Délai minimum de préparation (20 min) et pas des créneaux (10 min).

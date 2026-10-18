@@ -15,6 +15,7 @@ export function Hero({
   banner,
   prices,
   city,
+  address = null,
   cta,
   showMenuLink,
   status = null,
@@ -22,6 +23,8 @@ export function Hero({
   banner: string | null;
   prices: HeroPrices;
   city: string;
+  /** Rue du restaurant, affichée sous le nom pour qu'on le retrouve dans la rue. */
+  address?: string | null;
   /** Bouton principal du bandeau (la commande d'abord). */
   cta: { href: string; label: string };
   showMenuLink: boolean;
@@ -32,25 +35,23 @@ export function Hero({
     <section className="hero slats">
       <div className="wrap">
         <div className="hero-card">
-          {/* H1 = nom + activité + ville (référencement local) ; même apparence que l'ancien sur-titre */}
-          <h1 className="eyebrow">Pizza Milano · Pizzeria à emporter à {city}</h1>
-          <p className="hero-title">
-            Commandez, on enfourne, <em>vous passez récupérer.</em>
-          </p>
-          <p>
-            Choisissez vos pizzas sur la carte, indiquez l&apos;heure de retrait et réglez au comptoir. Votre commande
-            est transmise directement à la pizzeria.
-          </p>
-          {/* La commande d'abord : bouton principal visible dès l'arrivée */}
+          {/* H1 = nom + activité + ville (référencement local), lettré comme l'enseigne de la façade */}
+          <h1 className="hero-sign">
+            <span className="sign">Pizza Milano</span>
+            <span className="hero-sub">Pizzeria à emporter à {city}
+              {address ? ` · ${address}` : ""}
+            </span>
+          </h1>
+          <p className="hero-title">Commandez en ligne, on enfourne, vous passez récupérer.</p>
+          {/* Le paiement sur place, annoncé dès le premier écran, à côté du bouton */}
           <div className="hero-actions">
             <Link className="cta" href={cta.href}>
               {cta.label}
             </Link>
-            {showMenuLink && (
-              <a className="ghost" href="#carte">
-                Voir la carte
-              </a>
-            )}
+            <p className="pay-block">
+              <b>Paiement sur place, au retrait.</b>
+              <span>Rien à payer en ligne.</span>
+            </p>
           </div>
           {status && (
             <p className={`open-status${status.open ? " is-open" : ""}`}>
@@ -85,9 +86,11 @@ export function Hero({
                 Canettes <b>{euro(prices.can)}</b>
               </span>
             )}
-            <span className="chip">
-              <b>Paiement au comptoir</b>, au retrait
-            </span>
+            {showMenuLink && (
+              <a className="chip chip-link" href="#carte">
+                Voir la carte
+              </a>
+            )}
           </div>
           {banner && <div className="closed-banner">{banner}</div>}
         </div>

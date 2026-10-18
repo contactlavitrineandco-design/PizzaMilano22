@@ -23,6 +23,7 @@ export default async function CommanderPage() {
           prices={data.prices}
           status={data.status}
           city={data.city}
+          address={data.settings.address}
           cta={{ href: "#carte", label: "Choisir mes pizzas" }}
           showMenuLink={false}
         />

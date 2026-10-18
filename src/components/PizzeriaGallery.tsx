@@ -7,6 +7,12 @@ import type { GalleryPhoto, RestaurantSettings } from "@/lib/types";
 import { Lightbox, type LightboxPhoto } from "./Lightbox";
 import { MapEmbed } from "./MapEmbed";
 
+/** Vraie photo de la devanture (publication Instagram du restaurant), pour reconnaître la pizzeria dans la rue. */
+const STOREFRONT = {
+  src: "/photos/etablissement/devanture.webp",
+  alt: "Devanture de Pizza Milano au 3 rue du Maréchal Foch à Saint-Brieuc : façade en bois noir, enseigne lumineuse blanche PIZZA MILANO 22, porte ouverte et vitrine éclairée, rue pavée",
+};
+
 /**
  * « Découvrez notre pizzeria » : une présentation courte, la photo principale,
  * les autres photos éventuelles de la galerie, puis la carte pour venir.
@@ -106,9 +112,27 @@ export function PizzeriaGallery({ photos, settings }: { photos: GalleryPhoto[]; 
       )}
 
       {mapQuery && mapsUrl && (
-        <div className="about-map">
+        <div className="about-map" id="nous-trouver">
           <h3>Nous trouver</h3>
-          <MapEmbed query={mapQuery} label={fullAddress ?? settings.restaurant_name} mapsUrl={mapsUrl} />
+          <div className="find">
+            <figure className="find-photo">
+              <button
+                type="button"
+                className="ph-open"
+                aria-label="Agrandir la photo de la devanture"
+                onClick={() => setOpen({ src: STOREFRONT.src, alt: STOREFRONT.alt, title: "Notre devanture", illustration: false })}
+              >
+                <Image src={STOREFRONT.src} alt={STOREFRONT.alt} fill sizes="(max-width: 720px) 92vw, 380px" />
+              </button>
+            </figure>
+            <div className="find-side">
+              <p className="find-hint">
+                Façade noire, enseigne lumineuse <b>PIZZA MILANO 22</b>
+                {settings.address ? `, au ${settings.address}` : ""}.
+              </p>
+              <MapEmbed query={mapQuery} label={fullAddress ?? settings.restaurant_name} mapsUrl={mapsUrl} />
+            </div>
+          </div>
         </div>
       )}
 

@@ -1,0 +1,15 @@
+# Configuration Supabase CLI du site Pizza Milano.
+# Utilisée par le déploiement automatique GitHub → Supabase
+# (.github/workflows/supabase-base-de-donnees.yml à la racine du dépôt)
+# et par l'intégration GitHub de Supabase. Aucun secret ici.
+project_id = "pizza-milano"
+
+[api]
+schemas = ["public"]
+
+[db]
+major_version = 17
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]

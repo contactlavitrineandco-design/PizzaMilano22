@@ -8,7 +8,11 @@
   --counter-3:#272220;
   --oak:#b98552;          /* lattes chêne */
   --oak-dark:#7c5530;
-  --kraft:#d9b98c;        /* boîtes à pizza */
+  --kraft:#e3d5b8;        /* crème du logo (avant : #d9b98c, boîtes kraft) */
+  --facade:#161616;       /* noir mat de la devanture */
+  --granite:#6e6259;      /* granit de l'immeuble : filets et bordures */
+  --sign:#f6f7f9;         /* lettres de l'enseigne */
+  --sign-glow:#8ec5ff;    /* halo bleu froid de l'enseigne */
   --neon:#eaf6ff;         /* néon blanc froid */
   --neon-glow:#9fd3ff;
   --basil:#2fa35a;        /* vert drapeau / basilic */
@@ -16,7 +20,7 @@
   --ink:#f3ede6;
   --ink-2:#bfb3a6;
   --ink-3:#857868;
-  --line:#3a322c;
+  --line:#3d3530;
   --ok:#2fa35a; --warn:#e3a33a; --hot:#e5322d;
   --display:var(--font-alegreya), "Alegreya", Georgia, "Times New Roman", serif;
   --body:var(--font-figtree), "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -422,3 +426,88 @@ main:has(+ .site-foot) .shop{padding-bottom:12px}
 .toast-err{background:#ffb3ad;color:#2a0b08}
 @media (max-width:620px){.ger-product{grid-template-columns:1fr}.ger-photo{max-width:320px}}
 .ger-dl{display:inline-flex;align-items:center;text-decoration:none}
+
+/* =====================================================================
+   Amélioration du design (octobre 2026) : « le site ressemble à la devanture ».
+   Façade noire mat à moulures, enseigne blanche au halo bleu, médaillon du logo,
+   crème du logo. Même structure, mêmes fonctionnalités.
+   ===================================================================== */
+.sign{font-family:var(--font-jost),"Jost",Futura,"Century Gothic",system-ui,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sign);
+  text-shadow:0 0 1px var(--sign),0 0 6px rgba(142,197,255,.75),0 0 18px rgba(142,197,255,.45)}
+
+/* En-tête = bandeau d'enseigne sur la façade, filet tricolore dessous */
+.top{background:color-mix(in srgb,var(--facade) 94%,transparent);border-bottom:0;box-shadow:0 1px 0 #000}
+.top::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:linear-gradient(90deg,var(--basil) 0 33.3%,#f4f1ec 33.3% 66.6%,var(--tomato) 66.6%)}
+.brand{gap:12px}
+.brand-logo{width:44px;height:44px;border-radius:50%;flex:none;box-shadow:0 0 0 1px rgba(227,213,184,.25)}
+.brand .sign{display:block;font-size:20px;line-height:1.1}
+.brand small{margin-top:3px;letter-spacing:.08em;text-transform:none;font-size:12px;color:var(--ink-3)}
+.top-nav a{min-height:44px;display:inline-flex;align-items:center}
+.top-nav a:focus-visible,.hero a:focus-visible,.site-foot a:focus-visible,.press a:focus-visible,.chip-link:focus-visible{outline:2px solid var(--sign-glow);outline-offset:2px}
+
+/* Bandeau : la carte du héros devient un panneau de façade à moulure */
+.hero-card{max-width:620px;background:var(--facade);border:1px solid #000;border-radius:6px;box-shadow:inset 0 0 0 10px var(--facade),inset 0 0 0 11px rgba(227,213,184,.14),0 18px 40px rgba(0,0,0,.45);padding:32px}
+.hero h1.hero-sign{margin:0 0 14px;font-family:var(--body);line-height:1.1}
+.hero-sign .sign{display:block;font-size:clamp(36px,6vw,62px);line-height:1;letter-spacing:.05em}
+.hero-sub{display:block;margin-top:10px;font-size:15px;font-weight:600;color:var(--kraft)}
+.hero p.hero-title{font-family:var(--display);font-weight:800;font-size:clamp(22px,2.6vw,28px);line-height:1.2;margin:0 0 20px;color:var(--ink);max-width:30ch}
+.hero-actions{align-items:stretch;gap:12px;margin:0 0 18px}
+.hero-actions .cta{font-size:17px;padding-inline:26px;min-height:56px}
+.pay-block{display:flex;flex-direction:column;justify-content:center;margin:0;padding:8px 16px;min-height:56px;border-radius:10px;background:var(--kraft);color:#1d1610;line-height:1.3;max-width:none}
+.hero .pay-block{color:#1d1610;margin:0}
+.pay-block b{font-size:16px}
+.pay-block span{font-size:14px}
+.how-steps b{background:var(--kraft)}
+.chip{border-color:#2d2724;background:#1e1b19}
+.chip-link{color:var(--kraft);text-decoration:underline;text-underline-offset:3px;min-height:32px;display:inline-flex;align-items:center}
+
+/* Carte : hiérarchie nom > ingrédients > prix, bouton Ajouter plus net */
+.item{background:#1a1716;border-color:#2f2926}
+.item h3{font-size:20px}
+.item .ing{color:#c9bdb0}
+.price{font-size:17px;color:var(--kraft)}
+.add{min-height:44px;padding:8px 16px;background:var(--sign);color:var(--facade)}
+.add:hover{background:var(--kraft)}
+.tabs button{min-height:44px}
+.tabs button[aria-pressed="true"]{background:var(--kraft);border-color:var(--kraft);color:#1d1610}
+
+/* Ils parlent de nous : coupure de journal sur le mur en lattes */
+.press{margin-top:36px}
+.press-wall{border-radius:var(--r);padding:28px 16px;display:grid;place-items:center}
+.clipping{margin:0;max-width:620px;width:100%;background:#f3eee4;color:#1f1b17;padding:22px 24px 18px;border-radius:2px;box-shadow:0 10px 26px rgba(0,0,0,.45);position:relative}
+.clipping::before{content:"";position:absolute;top:-9px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--tomato);box-shadow:0 2px 3px rgba(0,0,0,.5)}
+.clip-source{margin:0 0 8px;font-size:13px;color:#5b524a}
+.clip-source b{color:#1f1b17}
+.clip-title{font-family:var(--display);font-weight:800;font-size:clamp(20px,2.4vw,25px);line-height:1.2;margin:0 0 12px;text-wrap:balance}
+.clip-quote{margin:0 0 12px;padding-left:14px;border-left:3px solid var(--tomato)}
+.clip-quote p{margin:0;font-family:var(--display);font-style:italic;font-size:18px;line-height:1.45}
+.clip-foot{font-size:13px;color:#5b524a}
+.clip-foot a{color:#a3201c;font-weight:700}
+
+/* Nous trouver : devanture + carte */
+.find{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:16px;align-items:start}
+.find-photo{position:relative;margin:0;aspect-ratio:1/1;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:var(--counter-3)}
+.find-photo img{object-fit:cover}
+.find-side{display:grid;gap:12px;min-width:0}
+.find-hint{margin:0;padding:12px 14px;border-radius:var(--r);background:var(--facade);border:1px solid var(--line);color:var(--ink-2);line-height:1.5}
+.find-hint b{color:var(--sign)}
+#nous-trouver{scroll-margin-top:84px}
+
+/* Pied de page = façade */
+.site-foot{background:var(--facade)}
+.foot-pay{margin:0 0 14px;color:var(--ink-2)}
+.foot-pay b{color:var(--kraft)}
+
+@media (max-width:720px){
+  .neon{max-width:132px}
+  .hero .wrap{gap:12px;padding-block:16px 24px}
+  .hero-card{padding:22px 18px;box-shadow:inset 0 0 0 6px var(--facade),inset 0 0 0 7px rgba(227,213,184,.14),0 12px 30px rgba(0,0,0,.45)}
+  .hero-actions{flex-direction:column}
+  .hero-actions .cta{width:100%}
+  .brand .sign{font-size:17px}
+  .brand-logo{width:40px;height:40px}
+  .find{grid-template-columns:1fr}
+  .find-photo{aspect-ratio:4/3}
+  .clipping{padding:20px 18px 16px}
+}
+@media (max-width:380px){.top-nav .top-cta{padding-inline:12px}}

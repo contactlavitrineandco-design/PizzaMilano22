@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -9,14 +10,12 @@ export function Header() {
   return (
     <header className="top">
       <div className="wrap">
-        <Link href="/" className="brand">
-          <span className="flag">
-            <i />
-            <i />
-            <i />
-          </span>
+        <Link href="/" className="brand" aria-label="Pizza Milano, accueil">
+          {/* Logo du restaurant (compte Instagram @milanopizza22) */}
+          <Image className="brand-logo" src="/brand/logo-192.png" alt="" width={44} height={44} priority />
           <span>
-            Pizza Milano<small>Pizzeria · À emporter</small>
+            <span className="sign">Pizza Milano</span>
+            <small>Pizzeria · À emporter</small>
           </span>
         </Link>
         {pro ? (

@@ -36,8 +36,10 @@ export function restaurantJsonLd(settings: RestaurantSettings, products: Product
     "@id": `${base}/#restaurant`,
     name: settings.restaurant_name,
     url: `${base}/`,
+    alternateName: "Pizza Milano 22",
     servesCuisine: ["Pizza"],
-    image: [`${base}/og.jpg`, ...gallery.filter((g) => g.source === "restaurant").map((g) => absolute(g.image_path))],
+    logo: `${base}/brand/logo-512.png`,
+    image: [`${base}/photos/etablissement/devanture.webp`, `${base}/og.jpg`, ...gallery.filter((g) => g.source === "restaurant").map((g) => absolute(g.image_path))],
     hasMenu: {
       "@type": "Menu",
       name: "Carte",
