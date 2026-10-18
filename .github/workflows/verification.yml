@@ -1,0 +1,27 @@
+# Vérifie le site à chaque envoi : lint puis build. Aucun secret nécessaire.
+name: "Vérification du site"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "Pizza Milano/création de site web"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: "Pizza Milano/création de site web/package-lock.json"
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build

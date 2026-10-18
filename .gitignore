@@ -1,12 +1,8 @@
-node_modules/
-.next/
-out/
-*.tsbuildinfo
-next-env.d.ts
+# Secrets : jamais dans le dépôt
 .env
-.env.local
-.env.*.local
-.vercel
-supabase/.branches
-supabase/.temp
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
 .DS_Store
